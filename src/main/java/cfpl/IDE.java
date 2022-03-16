@@ -7,7 +7,7 @@ import java.awt.event.ActionListener;
 
 public class IDE{
     private JTextArea inputTxtArea;
-    private JTextArea outputTxtArea;
+    public JTextArea outputTxtArea;
     private JButton runButton;
     private JPanel panelMain;
 
@@ -24,17 +24,21 @@ public class IDE{
             public void actionPerformed(ActionEvent e) {
                 outputTxtArea.setText("");
                 Program.runProgram(inputTxtArea.getText());
-                outputTxtArea.setText(Program.getOutput());
+                setOutputTxt(Program.getOutput());
             }
         });
     }
 
     public static void main(String[] args) {
         JFrame jframe = new JFrame("IDE");
-        jframe.setContentPane(new IDE().panelMain);
+        jframe.setContentPane(Program.ide.panelMain);
         jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jframe.pack();
         jframe.setVisible(true);
+    }
+
+    public void setOutputTxt(String output){
+        outputTxtArea.setText(output);
     }
 
 }

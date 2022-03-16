@@ -2,6 +2,7 @@ package cfpl;
 
 
 import cfpl.ErrorHandler.ParseError;
+import cfpl.enums.DataType;
 import cfpl.enums.TokenType;
 import cfpl.generated.Expr;
 import cfpl.generated.Stmt;
@@ -13,6 +14,7 @@ import java.util.List;
 class Parser {
     private final List<Token> tokens;
     private int current = 0;
+    boolean executeError = false;
 
     Parser(List<Token> tokens) {
         this.tokens = tokens;
@@ -21,7 +23,10 @@ class Parser {
     List<Stmt> parse() {
         List<Stmt> statements = new ArrayList<>();
         while (!isAtEnd()) {
-            statements.add(declaration());
+            List<Stmt> declarations = declareMany();
+            if(declarations != null && declarations.size() > 0){
+                statements.addAll(declarations);
+            }
         }
 
         return statements;
@@ -31,10 +36,10 @@ class Parser {
         return assignment();
     }
 
+
     private Stmt declaration() {
         try {
             if (match(TokenType.VAR)) return varDeclaration();
-
             return statement();
         } catch (ParseError error) {
             synchronize();
@@ -42,33 +47,188 @@ class Parser {
         }
     }
 
+    private List<Stmt> declareMany(){
+        List<Stmt> stmts =  new ArrayList<>();
+        try {
+            if (match(TokenType.VAR)){
+                List <Stmt.Var> vStmts = varDeclarations();
+                for(Stmt.Var var : vStmts){
+                    stmts.add(var);
+                }
+            }else{
+                stmts.add(statement());
+            }
+            return stmts;
+        } catch (ParseError error) {
+            synchronize();
+            return null;
+        }
+    }
+
     private Stmt statement() {
-        if (match(TokenType.PRINT)) return printStatement();
-        if (match(TokenType.LEFT_BRACE)) return new Stmt.Block(block());
+        if (match(TokenType.IF)) return ifStatement();
+//        if (match(TokenType.PRINT)) return printStatement();
+//        if (match(TokenType.LEFT_BRACE)) return new Stmt.Block(block());
+        if (match(TokenType.START)) return new Stmt.Block(executable());
+        executeError = true;
+        throw error(peek(),"Invalid statement outside executable");
+    }
 
+    private List<Stmt> executable() {
+        List<Stmt> statements = new ArrayList<>();
+        if(!match(TokenType.EOL)){
+            throw error(peek(), "Expect break line after block");
+        }
 
-        return expressionStatement();
+        while (!check(TokenType.STOP) && !isAtEnd()) {
+            statements.add(startStop());
+        }
+
+        consume(TokenType.STOP, "Expect 'STOP' after block.");
+        return statements;
+    }
+
+    private Stmt startStop() {
+        try {
+            if (match(TokenType.VAR)) return varDeclaration();
+            if (match(TokenType.IF)) return ifStatement();
+            if (match(TokenType.PRINT)) return printStatement();
+            if (match(TokenType.LEFT_BRACE)) return new Stmt.Block(block());
+            if (match(TokenType.START)) return new Stmt.Block(executable());
+            return expressionStatement();
+        } catch (ParseError error) {
+            synchronize();
+            return null;
+        }
+    }
+
+    private Stmt ifStatement() {
+        consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.");
+        Expr condition = expression();
+        consume(TokenType.RIGHT_PAREN, "Expect ')' after if condition.");
+
+        Stmt thenBranch = statement();
+        Stmt elseBranch = null;
+        if (match(TokenType.ELSE)) {
+            elseBranch = statement();
+        }
+
+        return new Stmt.If(condition, thenBranch, elseBranch);
     }
     private Stmt printStatement() {
         Expr value = expression();
-        consume(TokenType.SEMICOLON, "Expect ';' after value.");
+        consume(TokenType.EOL, "Expect new line after value.");
         return new Stmt.Print(value);
     }
-    private Stmt varDeclaration() {
+
+
+    private List<Stmt.Var> varDeclarations() {
         Token name = consume(TokenType.IDENTIFIER, "Expect variable name.");
 
+        List <Stmt.Var> tempVars = new ArrayList<>();
+
+        DataType dataType = DataType.NULL;;
+        Expr initializer = null;
+
+
+
+        if (match(TokenType.EQUAL)) {
+            initializer = expression();
+        }
+        tempVars.add(new Stmt.Var(name, initializer, dataType));
+
+        while(match(TokenType.COMMA)){
+            name = consume(TokenType.IDENTIFIER, "Expect a variable name");
+            initializer = null;
+            if(match(TokenType.EQUAL)){
+
+                initializer = expression();
+
+            }
+            tempVars.add(new Stmt.Var(name, initializer, dataType));
+        }
+
+        consume(TokenType.AS, "Expect 'AS' after variable declaration.");
+
+        switch(peek().type){
+            case INT:
+                dataType = DataType.INT;
+                break;
+            case CHAR:
+                dataType = DataType.CHAR;
+                break;
+
+            case BOOLEAN:
+                dataType = DataType.BOOLEAN;
+                break;
+
+            case FLOAT:
+                dataType = DataType.FLOAT;
+                break;
+            case STRING:
+                dataType = DataType.STRING;
+                break;
+            default:
+                break;
+        }
+
+        if(!match(TokenType.INT,TokenType.FLOAT,TokenType.CHAR,TokenType.BOOLEAN,TokenType.STRING)){
+            throw error(peek(), "Expect Data Type");
+        }
+
+        List<Stmt.Var> vars = new ArrayList<>();
+        for(Stmt.Var v : tempVars){
+            vars.add(new Stmt.Var(v.name,v.initializer,dataType));
+        }
+
+        consume(TokenType.EOL, "Expect new line after variable declaration.");
+        return vars;
+    }
+
+
+    private Stmt varDeclaration() {
+        Token name = consume(TokenType.IDENTIFIER, "Expect variable name.");
+        DataType dataType = DataType.INT;;
         Expr initializer = null;
         if (match(TokenType.EQUAL)) {
             initializer = expression();
         }
 
-        consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.");
-        return new Stmt.Var(name, initializer);
+        consume(TokenType.AS, "Expect 'AS' after variable declaration.");
+
+        switch(peek().type){
+            case INT:
+                dataType = DataType.INT;
+                break;
+            case CHAR:
+                dataType = DataType.CHAR;
+                break;
+
+            case BOOLEAN:
+                dataType = DataType.BOOLEAN;
+                break;
+
+            case FLOAT:
+                dataType = DataType.FLOAT;
+                break;
+            case STRING:
+                dataType = DataType.STRING;
+                break;
+            default:
+                break;
+        }
+
+        if(!match(TokenType.INT,TokenType.FLOAT,TokenType.CHAR,TokenType.BOOLEAN,TokenType.STRING)){
+            throw error(peek(), "Expect Data Type");
+        }
+
+        consume(TokenType.EOL, "Expect new line after variable declaration.");
+        return new Stmt.Var(name, initializer, dataType);
     }
 
     private Stmt expressionStatement() {
         Expr expr = expression();
-        consume(TokenType.SEMICOLON, "Expect ';' after expression.");
+        consume(TokenType.EOL, "Expect new line after expression.");
         return new Stmt.Expression(expr);
     }
 
@@ -166,7 +326,7 @@ class Parser {
         if (match(TokenType.TRUE)) return new Expr.Literal(true);
         if (match(TokenType.NIL)) return new Expr.Literal(null);
 
-        if (match(TokenType.NUMBER, TokenType.STRING)) {
+        if (match(TokenType.NUMBER, TokenType.STRING, TokenType.CHAR)) {
             return new Expr.Literal(previous().literal);
         }
 
@@ -226,14 +386,19 @@ class Parser {
     }
 
     private ParseError error(Token token, String message) {
-        Program.error(token, message);
+        boolean isReservedWord = CustomScanner.getReservedWords().get(token.lexeme) != null;
+        if(isReservedWord && !executeError){
+            Program.error(token, "Is a reserved word");
+        }else{
+            Program.error(token, message);
+        }
         return new ParseError();
     }
     private void synchronize() {
         advance();
 
         while (!isAtEnd()) {
-            if (previous().type == TokenType.SEMICOLON) return;
+            if (previous().type == TokenType.EOL) return;
 
             switch (peek().type) {
                 case CLASS:

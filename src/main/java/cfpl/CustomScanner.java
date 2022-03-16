@@ -19,10 +19,12 @@ public class CustomScanner {
     }
 
     List<Token> scanTokens() {
+        int counter = 0;
         while (!isAtEnd()) {
             // We are at the beginning of the next lexeme.
             start = current;
             scanToken();
+            counter++;
         }
 
         tokens.add(new Token(TokenType.EOF, "", null, line));
@@ -59,6 +61,7 @@ public class CustomScanner {
                 addToken(TokenType.MINUS);
                 break;
             case '+':
+            case '&':
                 addToken(TokenType.PLUS);
                 break;
             case ';':
@@ -86,11 +89,18 @@ public class CustomScanner {
                 break;
 
             case '\n':
+                if(tokens.size() >= 1 &&tokens.get(tokens.size()-1).type != TokenType.EOL) {
+                    addToken(TokenType.EOL);
+                }
+                 // TODO
                 line++;
                 break;
 
             case '"':
                 string();
+                break;
+            case '\'':
+                character();
                 break;
             default:
                 if (isDigit(c)) {
@@ -106,7 +116,9 @@ public class CustomScanner {
 
     private void identifier() {
         while (isAlphaNumeric(peek())) advance();
-
+        if(peek() == ':'){
+            advance();
+        }
 
         String text = source.substring(start, current);
         TokenType type = keywords.get(text);
@@ -145,6 +157,31 @@ public class CustomScanner {
         addToken(TokenType.STRING, value);
     }
 
+    private void character() {
+
+        if (peek() != '\'' && !isAtEnd()) {
+            if (peek() == '\n') line++;
+            advance();
+        }
+
+        if (isAtEnd()) {
+            Program.error(line, "Unterminated string.");
+            return;
+        }
+
+        // The closing '.
+        char closing = advance();
+        System.out.println("closingggg: " + closing);
+        if(closing != '\''){
+            Program.error(line, "Invalid character");
+
+            return;
+        }
+        // Trim the surrounding quotes.
+        char value = source.substring(start + 1, current - 1).charAt(0);
+        addToken(TokenType.CHAR, value);
+    }
+
     private void number() {
         while (isDigit(peek())) advance();
 
@@ -156,8 +193,7 @@ public class CustomScanner {
             while (isDigit(peek())) advance();
         }
 
-        addToken(TokenType.NUMBER,
-                Double.parseDouble(source.substring(start, current)));
+        addToken(TokenType.NUMBER, Double.parseDouble(source.substring(start, current)));
     }
 
     private char peekNext() {
@@ -215,5 +251,23 @@ public class CustomScanner {
         keywords.put("true",   TokenType.TRUE);
         keywords.put("var",    TokenType.VAR);
         keywords.put("while",  TokenType.WHILE);
+
+        //CFPL
+        keywords.put("START",  TokenType.START);
+        keywords.put("STOP",  TokenType.STOP);
+
+        keywords.put("OUTPUT:",  TokenType.PRINT);
+        keywords.put("VAR",    TokenType.VAR);
+
+        keywords.put("AS",    TokenType.AS);
+        keywords.put("INT",    TokenType.INT);
+        keywords.put("FLOAT",    TokenType.FLOAT);
+        keywords.put("BOOLEAN",    TokenType.BOOLEAN);
+        keywords.put("CHAR",    TokenType.CHAR);
+        keywords.put("STRING",    TokenType.STRING);
+    }
+
+    public static Map<String, TokenType> getReservedWords(){
+        return keywords;
     }
 }

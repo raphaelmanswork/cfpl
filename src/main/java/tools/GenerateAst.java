@@ -19,10 +19,13 @@ public class GenerateAst {
         ));
 
         defineAst(outputDir, "Stmt", Arrays.asList(
+                "Executable : List<Stmt> statements",
                 "Block      : List<Stmt> statements",
                 "Expression : Expr expression",
+                "If         : Expr condition, Stmt thenBranch," +
+                            " Stmt elseBranch",
                 "Print      : Expr expression",
-                "Var        : Token name, Expr initializer"
+                "Var        : Token name, Expr initializer, DataType dataType"
         ));
     }
     private static void defineAst(
@@ -34,6 +37,7 @@ public class GenerateAst {
         writer.println("package cfpl.generated;");
         writer.println();
         writer.println("import cfpl.Token;");
+        writer.println("import cfpl.enums.DataType;");
         writer.println();
         writer.println("import java.util.List;");
         writer.println();

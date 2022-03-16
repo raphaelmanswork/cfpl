@@ -10,20 +10,24 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Program {
+    public static IDE ide = new IDE();
     private static final Interpreter interpreter = new Interpreter();
 
     static boolean hadError = false;
     static boolean hadRuntimeError = false;
 
 
+    private static String errorOutput = "";
+
+
 
     public static void runProgram(String source){
-
+        hadError=hadRuntimeError=false;
         run(source);
 
 
-        if (hadError)  System.exit(65);
-        if (hadRuntimeError) System.exit(70);
+//        if (hadError)  System.exit(65);
+//        if (hadRuntimeError) System.exit(70);
     }
 
 
@@ -31,17 +35,15 @@ public class Program {
         CustomScanner scanner = new CustomScanner(source);
         List<Token> tokens = scanner.scanTokens();
 
-        // For now, just print the tokens.
-//        for (Token token : tokens) {
-//            System.out.println(token);
-//        }
+        for(Token tk : tokens){
+            System.out.println(tk);
+        }
 
         Parser parser = new Parser(tokens);
         List<Stmt> statements = parser.parse();
 
 
         if (hadError) return;
-
 
         interpreter.interpret(statements);
     }
@@ -50,6 +52,9 @@ public class Program {
     public static String getOutput(){
         String output = interpreter.getOutputList();
         interpreter.clearOutput();
+        if(hadError || hadRuntimeError){
+            return errorOutput;
+        }
         return output;
     }
 
@@ -61,12 +66,17 @@ public class Program {
 
     private static void report(int line, String where,
                                String message) {
-        System.err.println(
-                "[line " + line + "] Error" + where + ": " + message);
+
+        String err =  "[line " + line + "] Error" + where + ": " + message;
+        System.err.println(err);
+
+        errorOutput = err;
         hadError = true;
     }
 
     static void error(Token token, String message) {
+        System.out.println("went over error");
+
         if (token.type == TokenType.EOF) {
             report(token.line, " at end", message);
         } else {
@@ -75,9 +85,14 @@ public class Program {
     }
 
     static void runtimeError(RuntimeError error) {
-        System.err.println(error.getMessage() +
-                "\n[line " + error.token.line + "]");
+        System.out.println("went over run time error");
+        String err =  error.getMessage() +
+                "\n[line " + error.token.line + "]";
+        System.err.println(err);
         hadRuntimeError = true;
+        errorOutput = err;
     }
+
+
 
 }

@@ -1,6 +1,7 @@
 package cfpl;
 
 import cfpl.ErrorHandler.RuntimeError;
+import cfpl.enums.DataType;
 import cfpl.generated.Expr;
 import cfpl.generated.Stmt;
 
@@ -30,8 +31,11 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>  {
 
         switch (expr.operator.type) {
             case PLUS:
-                if (left instanceof Double && right instanceof Double) {
-                    return (double)left + (double)right;
+                System.out.println("visitzxvc");
+                System.out.println(left instanceof Number);
+                System.out.println(right instanceof Number);
+                if (left instanceof Number && right instanceof Number) {
+                    return (double) left + (double)right;
                 }
 
                 if (left instanceof String && right instanceof String) {
@@ -112,9 +116,21 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>  {
     }
 
     @Override
+    public Void visitExecutableStmt(Stmt.Executable stmt) {
+        executeExecutable(stmt.statements);
+        return null;
+    }
+
+    @Override
     public Void visitBlockStmt(Stmt.Block stmt) {
         executeBlock(stmt.statements, new Environment(environment));
         return null;
+    }
+
+    void executeExecutable(List<Stmt> statements) {
+            for (Stmt statement : statements) {
+                execute(statement);
+            }
     }
 
     void executeBlock(List<Stmt> statements,
@@ -164,6 +180,16 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>  {
     }
 
     @Override
+    public Void visitIfStmt(Stmt.If stmt) {
+        if (isTruthy(evaluate(stmt.condition))) {
+            execute(stmt.thenBranch);
+        } else if (stmt.elseBranch != null) {
+            execute(stmt.elseBranch);
+        }
+        return null;
+    }
+
+    @Override
     public Void visitPrintStmt(Stmt.Print stmt) {
         Object value = evaluate(stmt.expression);
         System.out.println(stringify(value));
@@ -175,7 +201,33 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>  {
     public Void visitVarStmt(Stmt.Var stmt) {
         Object value = null;
         if (stmt.initializer != null) {
-            value = evaluate(stmt.initializer);
+            try{
+                switch(stmt.dataType){
+                    case INT:
+                        value = (double) evaluate(stmt.initializer);
+                        break;
+                    case CHAR:
+                        value = (char) evaluate(stmt.initializer);
+                        break;
+
+                    case BOOLEAN:
+                        value = (boolean) evaluate(stmt.initializer);
+                        break;
+                    case FLOAT:
+                        value = (double) evaluate(stmt.initializer);
+                        break;
+
+                    case STRING:
+                        value = (String) evaluate(stmt.initializer);
+                        break;
+                    default:
+                        value = null;
+                        break;
+                }
+            }catch(ClassCastException  e){
+                System.out.println(e);
+                Program.error(stmt.name,"Error: "+stmt.dataType+" Incorrect Datatype");
+            }
         }
 
         environment.define(stmt.name.lexeme, value);

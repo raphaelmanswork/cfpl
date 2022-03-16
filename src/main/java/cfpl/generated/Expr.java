@@ -1,6 +1,7 @@
 package cfpl.generated;
 
 import cfpl.Token;
+import cfpl.enums.DataType;
 
 import java.util.List;
 

@@ -3,7 +3,7 @@ package cfpl.enums;
 public enum TokenType {
 
     // CFPL
-    START, STOP,
+    START, STOP, EOL, AS, INT, FLOAT, BOOLEAN, CHAR,
 
     LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
     COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR,
