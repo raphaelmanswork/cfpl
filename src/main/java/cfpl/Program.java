@@ -19,10 +19,9 @@ public class Program {
 
     private static String errorOutput = "";
 
-
-
     public static void runProgram(String source){
         hadError=hadRuntimeError=false;
+        errorOutput = "";
         run(source);
 
 
@@ -70,7 +69,7 @@ public class Program {
         String err =  "[line " + line + "] Error" + where + ": " + message;
         System.err.println(err);
 
-        errorOutput = err;
+        errorOutput = err + "\n"+errorOutput;
         hadError = true;
     }
 

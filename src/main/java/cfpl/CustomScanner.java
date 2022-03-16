@@ -26,7 +26,9 @@ public class CustomScanner {
             scanToken();
             counter++;
         }
-
+        if(shouldAddNewLine() && tokens.get(tokens.size()-1).type != TokenType.STOP) {
+            addToken(TokenType.EOL);
+        } //TODO
         tokens.add(new Token(TokenType.EOF, "", null, line));
         return tokens;
     }
@@ -70,6 +72,9 @@ public class CustomScanner {
             case '*':
                 addToken(TokenType.STAR);
                 break;
+            case '/':
+                addToken(TokenType.SLASH);
+                break;
             case '!':
                 addToken(match('=') ? TokenType.BANG_EQUAL : TokenType.BANG);
                 break;
@@ -89,7 +94,7 @@ public class CustomScanner {
                 break;
 
             case '\n':
-                if(tokens.size() >= 1 &&tokens.get(tokens.size()-1).type != TokenType.EOL) {
+                if(shouldAddNewLine()) {
                     addToken(TokenType.EOL);
                 }
                  // TODO
@@ -112,6 +117,10 @@ public class CustomScanner {
                 }
                 break;
         }
+    }
+
+    private boolean shouldAddNewLine(){
+        return tokens.size() >= 1 &&tokens.get(tokens.size()-1).type != TokenType.EOL;
     }
 
     private void identifier() {
