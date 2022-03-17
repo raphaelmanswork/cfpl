@@ -1,14 +1,14 @@
 package cfpl;
 
 import cfpl.ErrorHandler.RuntimeError;
-import cfpl.enums.DataType;
 import cfpl.generated.Expr;
 import cfpl.generated.Stmt;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
-class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>  {
+class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     private ArrayList<String> outputList = new ArrayList<>();
     private Environment environment = new Environment();
@@ -30,46 +30,48 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>  {
         Object right = evaluate(expr.right);
 
         switch (expr.operator.type) {
+            case AMPERSAND:
+                return left + "" + right;
             case PLUS:
-                System.out.println("visitzxvc");
-                System.out.println(left instanceof Number);
-                System.out.println(right instanceof Number);
                 if (left instanceof Number && right instanceof Number) {
-                    return (double) left + (double)right;
+                    return (double) left + (double) right;
                 }
 
                 if (left instanceof String && right instanceof String) {
-                    return (String)left + (String)right;
+                    return (String) left + (String) right;
                 }
                 throw new RuntimeError(expr.operator,
                         "Operands must be two numbers or two strings.");
             case MINUS:
                 checkNumberOperands(expr.operator, left, right);
-                return (double)left - (double)right;
+                return (double) left - (double) right;
             case SLASH:
                 checkNumberOperands(expr.operator, left, right);
-                return (double)left / (double)right;
+                return (double) left / (double) right;
             case STAR:
                 checkNumberOperands(expr.operator, left, right);
-                return (double)left * (double)right;
+                return (double) left * (double) right;
             case GREATER:
                 checkNumberOperands(expr.operator, left, right);
-                return (double)left > (double)right;
+                return (double) left > (double) right;
             case GREATER_EQUAL:
-                return (double)left >= (double)right;
+                return (double) left >= (double) right;
             case LESS:
                 checkNumberOperands(expr.operator, left, right);
-                return (double)left < (double)right;
+                return (double) left < (double) right;
             case LESS_EQUAL:
                 checkNumberOperands(expr.operator, left, right);
-                return (double)left <= (double)right;
-            case BANG_EQUAL: return !isEqual(left, right);
-            case EQUAL_EQUAL: return isEqual(left, right);
+                return (double) left <= (double) right;
+            case BANG_EQUAL:
+                return !isEqual(left, right);
+            case EQUAL_EQUAL:
+                return isEqual(left, right);
         }
 
         // Unreachable.
         return null;
     }
+
     private void checkNumberOperands(Token operator,
                                      Object left, Object right) {
         if (left instanceof Double && right instanceof Double) return;
@@ -96,12 +98,13 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>  {
                 return !isTruthy(right);
             case MINUS:
                 checkNumberOperand(expr.operator, right);
-                return -(double)right;
+                return -(double) right;
         }
 
         // Unreachable.
         return null;
     }
+
     private void checkNumberOperand(Token operator, Object operand) {
         if (operand instanceof Double) return;
         throw new RuntimeError(operator, "Operand must be a number.");
@@ -113,6 +116,48 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>  {
 
     private void execute(Stmt stmt) {
         stmt.accept(this);
+    }
+
+    @Override
+    public Void visitInputStmt(Stmt.Input input) {
+
+        String inputs = JOptionPane.showInputDialog(null, "INPUTS:");
+        String[] values = inputs.split(",");
+        if(inputs == null || values.length != input.tokens.size()){
+            Program.error(input.tokens.get(0), "Error you did not enter values");
+
+            return null;
+        }
+        for (int i = 0; i < input.tokens.size(); i++) {
+            Object fValue = values[i];
+            String value = values[i];
+            Token t = input.tokens.get(i);
+            Expr.Variable var = new Expr.Variable(t);
+            Object currValue = environment.get(var.name);
+
+            if (currValue != null) {
+                try {
+                    if (currValue instanceof Double) {
+                        fValue = Double.parseDouble(value);
+                    }  else if (currValue instanceof Character) {
+                        if(value.length() > 1){
+                            throw new RuntimeError(var.name, "Expected a character");
+                        }else if (value.length() == 1){
+                            fValue = value.charAt(0);
+                        }
+                    } else if (currValue instanceof Integer) {
+                        fValue = Integer.valueOf(value);
+                    } else if (currValue instanceof Boolean) {
+                        fValue = Boolean.valueOf(value);
+                    }
+                } catch (ClassCastException | NumberFormatException e ) {
+                    System.out.println(e);
+                    Program.runtimeError(new RuntimeError(var.name, "Error: Incorrect Datatype"));
+                }
+            }
+            environment.assign(var.name, fValue);
+        }
+        return null;
     }
 
     @Override
@@ -128,9 +173,9 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>  {
     }
 
     void executeExecutable(List<Stmt> statements) {
-            for (Stmt statement : statements) {
-                execute(statement);
-            }
+        for (Stmt statement : statements) {
+            execute(statement);
+        }
     }
 
     void executeBlock(List<Stmt> statements,
@@ -149,7 +194,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>  {
 
     private boolean isTruthy(Object object) {
         if (object == null) return false;
-        if (object instanceof Boolean) return (boolean)object;
+        if (object instanceof Boolean) return (boolean) object;
         return true;
     }
 
@@ -159,6 +204,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>  {
 
         return a.equals(b);
     }
+
     private String stringify(Object object) {
         if (object == null) return "nil";
 
@@ -201,8 +247,8 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>  {
     public Void visitVarStmt(Stmt.Var stmt) {
         Object value = null;
         if (stmt.initializer != null) {
-            try{
-                switch(stmt.dataType){
+            try {
+                switch (stmt.dataType) {
                     case INT:
                         value = (double) evaluate(stmt.initializer);
                         break;
@@ -224,9 +270,8 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>  {
                         value = null;
                         break;
                 }
-            }catch(ClassCastException  e){
-                System.out.println(e);
-                Program.error(stmt.name,"Error: "+stmt.dataType+" Incorrect Datatype");
+            } catch (ClassCastException e) {
+                Program.error(stmt.name, "Error: " + stmt.dataType + " Incorrect Datatype");
             }
         }
 
@@ -249,8 +294,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>  {
 
     public String getOutputList() {
         StringBuilder sb = new StringBuilder();
-        for (String s : outputList)
-        {
+        for (String s : outputList) {
             sb.append(s);
             sb.append("\n");
         }

@@ -69,9 +69,22 @@ class Parser {
         if (match(TokenType.IF)) return ifStatement();
 //        if (match(TokenType.PRINT)) return printStatement();
 //        if (match(TokenType.LEFT_BRACE)) return new Stmt.Block(block());
+        if (match(TokenType.INPUT)) return new Stmt.Input(input());
         if (match(TokenType.START)) return new Stmt.Block(executable());
         executeError = true;
         throw error(peek(),"Invalid statement outside executable");
+    }
+
+    private List<Token> input() {
+        Token name = consume(TokenType.IDENTIFIER, "Expect variable name.");
+        List <Token> tokens = new ArrayList<>();
+        tokens.add(name);
+        while(match(TokenType.COMMA)){
+            tokens.add(consume(TokenType.IDENTIFIER, "Expect a variable name"));
+        }
+
+        consume(TokenType.EOL, "Expect new line after variable declaration.");
+        return tokens;
     }
 
     private List<Stmt> executable() {
@@ -290,7 +303,7 @@ class Parser {
     private Expr term() {
         Expr expr = factor();
 
-        while (match(TokenType.MINUS, TokenType.PLUS)) {
+        while (match(TokenType.MINUS, TokenType.PLUS, TokenType.AMPERSAND)) {
             Token operator = previous();
             Expr right = factor();
             expr = new Expr.Binary(expr, operator, right);

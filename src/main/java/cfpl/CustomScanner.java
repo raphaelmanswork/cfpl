@@ -62,8 +62,10 @@ public class CustomScanner {
             case '-':
                 addToken(TokenType.MINUS);
                 break;
-            case '+':
             case '&':
+                addToken(TokenType.AMPERSAND);
+                break;
+            case '+':
                 addToken(TokenType.PLUS);
                 break;
             case ';':
@@ -265,6 +267,8 @@ public class CustomScanner {
         keywords.put("START",  TokenType.START);
         keywords.put("STOP",  TokenType.STOP);
 
+
+        keywords.put("INPUT:",  TokenType.INPUT);
         keywords.put("OUTPUT:",  TokenType.PRINT);
         keywords.put("VAR",    TokenType.VAR);
 
@@ -274,6 +278,7 @@ public class CustomScanner {
         keywords.put("BOOLEAN",    TokenType.BOOLEAN);
         keywords.put("CHAR",    TokenType.CHAR);
         keywords.put("STRING",    TokenType.STRING);
+
     }
 
     public static Map<String, TokenType> getReservedWords(){
