@@ -257,12 +257,19 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
                         break;
 
                     case BOOLEAN:
-                        value = (boolean) evaluate(stmt.initializer);
+                        value =  evaluate(stmt.initializer);
+
+                        if (value instanceof String && "true".equalsIgnoreCase((String) value)){
+                            value = true;
+                        } else if (value instanceof String && "false".equalsIgnoreCase((String) value)) {
+                            value = false;
+                        } else {
+                            value =  (boolean) value;
+                        }
                         break;
                     case FLOAT:
                         value = (double) evaluate(stmt.initializer);
                         break;
-
                     case STRING:
                         value = (String) evaluate(stmt.initializer);
                         break;

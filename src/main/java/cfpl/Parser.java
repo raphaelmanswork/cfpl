@@ -69,7 +69,6 @@ class Parser {
         if (match(TokenType.IF)) return ifStatement();
 //        if (match(TokenType.PRINT)) return printStatement();
 //        if (match(TokenType.LEFT_BRACE)) return new Stmt.Block(block());
-        if (match(TokenType.INPUT)) return new Stmt.Input(input());
         if (match(TokenType.START)) return new Stmt.Block(executable());
         executeError = true;
         throw error(peek(),"Invalid statement outside executable");
@@ -103,6 +102,7 @@ class Parser {
 
     private Stmt startStop() {
         try {
+            if (match(TokenType.INPUT)) return new Stmt.Input(input());
             if (match(TokenType.VAR)) return varDeclaration();
             if (match(TokenType.IF)) return ifStatement();
             if (match(TokenType.PRINT)) return printStatement();
@@ -339,7 +339,7 @@ class Parser {
         if (match(TokenType.TRUE)) return new Expr.Literal(true);
         if (match(TokenType.NIL)) return new Expr.Literal(null);
 
-        if (match(TokenType.NUMBER, TokenType.STRING, TokenType.CHAR)) {
+        if (match(TokenType.NUMBER, TokenType.STRING, TokenType.CHAR, TokenType.BOOLEAN)) {
             return new Expr.Literal(previous().literal);
         }
 

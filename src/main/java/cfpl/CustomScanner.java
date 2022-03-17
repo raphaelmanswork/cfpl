@@ -135,7 +135,6 @@ public class CustomScanner {
         TokenType type = keywords.get(text);
         if (type == null) type = TokenType.IDENTIFIER;
         addToken(type);
-
     }
 
     private boolean isAlphaNumeric(char c) {
@@ -182,7 +181,6 @@ public class CustomScanner {
 
         // The closing '.
         char closing = advance();
-        System.out.println("closingggg: " + closing);
         if(closing != '\''){
             Program.error(line, "Invalid character");
 
@@ -275,7 +273,7 @@ public class CustomScanner {
         keywords.put("AS",    TokenType.AS);
         keywords.put("INT",    TokenType.INT);
         keywords.put("FLOAT",    TokenType.FLOAT);
-        keywords.put("BOOLEAN",    TokenType.BOOLEAN);
+        keywords.put("BOOL",    TokenType.BOOLEAN);
         keywords.put("CHAR",    TokenType.CHAR);
         keywords.put("STRING",    TokenType.STRING);
 
