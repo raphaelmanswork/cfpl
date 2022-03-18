@@ -88,9 +88,7 @@ class Parser {
 
     private List<Stmt> executable() {
         List<Stmt> statements = new ArrayList<>();
-        if(!match(TokenType.EOL)){
-            throw error(peek(), "Expect break line after block");
-        }
+        consume(TokenType.EOL, "Expected a new line");
 
         while (!check(TokenType.STOP) && !isAtEnd()) {
             statements.add(startStop());
@@ -370,7 +368,7 @@ class Parser {
     }
     private Token consume(TokenType type, String message) {
         if (check(type)) return advance();
-
+        executeError = true;
         throw error(peek(), message);
     }
 
