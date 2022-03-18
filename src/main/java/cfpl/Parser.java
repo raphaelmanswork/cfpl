@@ -71,7 +71,7 @@ class Parser {
 //        if (match(TokenType.LEFT_BRACE)) return new Stmt.Block(block());
         if (match(TokenType.START)) return new Stmt.Block(executable());
         executeError = true;
-        throw error(peek(),"Invalid statement outside executable");
+        throw error(peek(),"Expected to be wrapped in executable");
     }
 
     private List<Token> input() {
