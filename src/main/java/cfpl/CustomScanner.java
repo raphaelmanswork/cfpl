@@ -256,6 +256,10 @@ public class CustomScanner {
         keywords.put("STOP",  TokenType.STOP);
 
 
+
+        keywords.put("INPUT",  TokenType.INPUT);
+        keywords.put("OUTPUT",  TokenType.PRINT);
+
         keywords.put("INPUT:",  TokenType.INPUT);
         keywords.put("OUTPUT:",  TokenType.PRINT);
         keywords.put("VAR",    TokenType.VAR);
