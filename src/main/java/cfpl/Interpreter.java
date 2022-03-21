@@ -1,6 +1,7 @@
 package cfpl;
 
 import cfpl.ErrorHandler.RuntimeError;
+import cfpl.enums.DataType;
 import cfpl.generated.Expr;
 import cfpl.generated.Stmt;
 
@@ -126,7 +127,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
         String inputs = JOptionPane.showInputDialog(null, "INPUTS:");
         String[] values = inputs.split(",");
-        if(inputs == null || values.length != input.tokens.size()){
+        if (inputs == null || values.length != input.tokens.size()) {
             Program.error(input.tokens.get(0), "Error you did not enter values");
 
             return null;
@@ -136,27 +137,36 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             String value = values[i];
             Token t = input.tokens.get(i);
             Expr.Variable var = new Expr.Variable(t);
-            Object currValue = environment.get(var.name);
+            Value currValue = environment.get(var.name);
 
-            if (currValue != null) {
-                try {
-                    if (currValue instanceof Double) {
-                        fValue = Double.parseDouble(value);
-                    }  else if (currValue instanceof Character) {
-                        if(value.length() > 1){
-                            throw new RuntimeError(var.name, "Expected a character");
-                        }else if (value.length() == 1){
-                            fValue = value.charAt(0);
-                        }
-                    } else if (currValue instanceof Integer) {
-                        fValue = Integer.valueOf(value);
-                    } else if (currValue instanceof Boolean) {
-                        fValue = Boolean.valueOf(value);
+
+            try {
+                if (currValue.dataType == DataType.FLOAT) {
+                    fValue = Double.parseDouble(value);
+                } else if (currValue.dataType == DataType.CHAR) {
+                    if (value.length() > 1) {
+                        throw new RuntimeError(var.name, "Expected a character");
+                    } else if (value.length() == 1) {
+                        fValue = value.charAt(0);
                     }
-                } catch (ClassCastException | NumberFormatException e ) {
-                    System.out.println(e);
-                    Program.runtimeError(new RuntimeError(var.name, "Error: Incorrect Datatype"));
+                } else if (currValue.dataType == DataType.INT) {
+
+                    double test = Double.parseDouble(value);
+                    if (test > 0) {
+                        test = test - Math.round(test);
+                        if (test > 0) {
+                            throw new NumberFormatException("Value is not int");
+                        }
+                    }
+                    fValue = Double.valueOf(Double.parseDouble(value)).intValue();
+                } else if (currValue.dataType == DataType.BOOLEAN) {
+                    fValue = Boolean.valueOf(value);
                 }
+            } catch (ClassCastException | NumberFormatException e) {
+                System.out.println(e);
+                Program.runtimeError(new RuntimeError(var.name, "Error: Incorrect Datatype"));
+            } catch (NullPointerException e) {
+                fValue = null;
             }
             environment.assign(var.name, fValue);
         }
@@ -250,16 +260,10 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     public Void visitVarStmt(Stmt.Var stmt) {
         Object value = null;
         if (stmt.initializer != null) {
-            try {
-               value = Value.applyDataType(evaluate(stmt.initializer), stmt.dataType);
-            } catch (ClassCastException | NumberFormatException e) {
-                Program.error(stmt.name, "Error: " + stmt.dataType + " Incorrect Datatype");
-            }catch( NullPointerException e){
-                value = null;
-            }
+            value = evaluate(stmt.initializer);
         }
 
-        environment.define(stmt.name.lexeme, new Value(value,stmt.dataType));
+        environment.define(stmt.name.lexeme, new Value(value, stmt.dataType));
         return null;
     }
 
@@ -272,7 +276,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Object visitVariableExpr(Expr.Variable expr) {
-        return environment.get(expr.name);
+        return environment.get(expr.name).value;
     }
 
 

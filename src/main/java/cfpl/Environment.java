@@ -22,9 +22,9 @@ class Environment {
         values.put(name, value);
     }
 
-    Object get(Token name) {
+    Value get(Token name) {
         if (values.containsKey(name.lexeme)) {
-            return values.get(name.lexeme).value;
+            return values.get(name.lexeme);
         }
 
         if (enclosing != null) return enclosing.get(name);

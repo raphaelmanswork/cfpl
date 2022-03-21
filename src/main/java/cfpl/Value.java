@@ -28,9 +28,22 @@ public class Value {
 
     static Object applyDataType(Object value, DataType type) {
         Object fValue = null;
+
         switch (type) {
             case INT:
-                fValue =  Math.round((double) value);
+
+                if(value instanceof Double){
+                    double test = (double) value;
+                    if(test > 0){
+                        test = (double) value - Math.round((double) value);
+                        if(test > 0){
+                            throw new NumberFormatException("Value is not int");
+                        }
+                    }
+                    fValue =  Math.round((double) value);
+                }else{
+                    fValue =  value;
+                }
                 break;
             case CHAR:
                 fValue = (char) value;
