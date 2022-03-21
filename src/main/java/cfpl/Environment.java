@@ -1,12 +1,13 @@
 package cfpl;
 
 import cfpl.ErrorHandler.RuntimeError;
+import cfpl.enums.DataType;
 
 import java.util.HashMap;
 import java.util.Map;
 
 class Environment {
-    private final Map<String, Object> values = new HashMap<>();
+    private final Map<String, Value> values = new HashMap<>();
     final Environment enclosing;
 
     Environment() {
@@ -17,13 +18,13 @@ class Environment {
         this.enclosing = enclosing;
     }
 
-    void define(String name, Object value) {
+    void define(String name, Value value) {
         values.put(name, value);
     }
 
     Object get(Token name) {
         if (values.containsKey(name.lexeme)) {
-            return values.get(name.lexeme);
+            return values.get(name.lexeme).value;
         }
 
         if (enclosing != null) return enclosing.get(name);
@@ -34,7 +35,9 @@ class Environment {
 
     void assign(Token name, Object value) {
         if (values.containsKey(name.lexeme)) {
-            values.put(name.lexeme, value);
+
+            DataType type = values.get(name.lexeme).dataType;
+            values.put(name.lexeme, new Value(value,type));
             return;
         }
 

@@ -251,41 +251,13 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object value = null;
         if (stmt.initializer != null) {
             try {
-                switch (stmt.dataType) {
-                    case INT:
-                        value = (double) evaluate(stmt.initializer);
-                        break;
-                    case CHAR:
-                        value = (char) evaluate(stmt.initializer);
-                        break;
-
-                    case BOOLEAN:
-                        value =  evaluate(stmt.initializer);
-
-                        if (value instanceof String && "true".equalsIgnoreCase((String) value)){
-                            value = true;
-                        } else if (value instanceof String && "false".equalsIgnoreCase((String) value)) {
-                            value = false;
-                        } else {
-                            value =  (boolean) value;
-                        }
-                        break;
-                    case FLOAT:
-                        value = (double) evaluate(stmt.initializer);
-                        break;
-                    case STRING:
-                        value = (String) evaluate(stmt.initializer);
-                        break;
-                    default:
-                        value = null;
-                        break;
-                }
+               value = Value.applyDataType(evaluate(stmt.initializer), stmt.dataType);
             } catch (ClassCastException e) {
                 Program.error(stmt.name, "Error: " + stmt.dataType + " Incorrect Datatype");
             }
         }
 
-        environment.define(stmt.name.lexeme, value);
+        environment.define(stmt.name.lexeme, new Value(value,stmt.dataType));
         return null;
     }
 
