@@ -252,7 +252,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         if (stmt.initializer != null) {
             try {
                value = Value.applyDataType(evaluate(stmt.initializer), stmt.dataType);
-            } catch (ClassCastException e) {
+            } catch (ClassCastException | NullPointerException | NumberFormatException e) {
                 Program.error(stmt.name, "Error: " + stmt.dataType + " Incorrect Datatype");
             }
         }

@@ -16,7 +16,7 @@ public class Value {
         this.dataType = type;
         try {
             this.value = applyDataType(value, type);
-        } catch (ClassCastException | NumberFormatException e) {
+        } catch (ClassCastException | NumberFormatException | NullPointerException e) {
             Token t = new Token(TokenType.VAR, String.valueOf(value), value, 0);
             throw new RuntimeError(t,
                     "ASSIGNMENT ERROR: Invalid datatype (Must be: "+ type.toString() +").");
