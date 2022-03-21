@@ -16,15 +16,18 @@ public class Value {
         this.dataType = type;
         try {
             this.value = applyDataType(value, type);
-        } catch (ClassCastException | NumberFormatException | NullPointerException e) {
+        } catch (ClassCastException | NumberFormatException e) {
+            System.out.println(e);
             Token t = new Token(TokenType.VAR, String.valueOf(value), value, 0);
             throw new RuntimeError(t,
                     "ASSIGNMENT ERROR: Invalid datatype (Must be: "+ type.toString() +").");
+        } catch( NullPointerException e){
+            this.value = null;
         }
     }
 
     static Object applyDataType(Object value, DataType type) {
-        Object fValue;
+        Object fValue = null;
         switch (type) {
             case INT:
                 fValue =  Math.round((double) value);

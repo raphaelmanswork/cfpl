@@ -209,7 +209,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     private String stringify(Object object) {
-        if (object == null) return "nil";
+        if (object == null) return "null";
 
         if (object instanceof Double) {
             String text = object.toString();
@@ -252,8 +252,10 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         if (stmt.initializer != null) {
             try {
                value = Value.applyDataType(evaluate(stmt.initializer), stmt.dataType);
-            } catch (ClassCastException | NullPointerException | NumberFormatException e) {
+            } catch (ClassCastException | NumberFormatException e) {
                 Program.error(stmt.name, "Error: " + stmt.dataType + " Incorrect Datatype");
+            }catch( NullPointerException e){
+                value = null;
             }
         }
 
