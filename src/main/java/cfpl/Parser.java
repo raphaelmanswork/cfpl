@@ -67,22 +67,20 @@ class Parser {
 
     private Stmt statement() {
         if (match(TokenType.IF)) return ifStatement();
-//        if (match(TokenType.PRINT)) return printStatement();
-//        if (match(TokenType.LEFT_BRACE)) return new Stmt.Block(block());
         if (match(TokenType.START)) return new Stmt.Block(executable());
         executeError = true;
         throw error(peek(),"Expected to be wrapped in executable");
     }
 
     private List<Token> input() {
-        Token name = consume(TokenType.IDENTIFIER, "Expect variable name.");
+        Token name = consume(TokenType.IDENTIFIER, "Expected variable name.");
         List <Token> tokens = new ArrayList<>();
         tokens.add(name);
         while(match(TokenType.COMMA)){
-            tokens.add(consume(TokenType.IDENTIFIER, "Expect a variable name"));
+            tokens.add(consume(TokenType.IDENTIFIER, "Expected a variable name"));
         }
 
-        consume(TokenType.EOL, "Expect new line after variable declaration.");
+        consume(TokenType.EOL, "Expected new line after variable declaration.");
         return tokens;
     }
 
@@ -94,7 +92,7 @@ class Parser {
             statements.add(startStop());
         }
 
-        consume(TokenType.STOP, "Expect 'STOP' after block.");
+        consume(TokenType.STOP, "Expected 'STOP' after block.");
         return statements;
     }
 
@@ -114,9 +112,9 @@ class Parser {
     }
 
     private Stmt ifStatement() {
-        consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.");
+        consume(TokenType.LEFT_PAREN, "Expected '(' after 'if'.");
         Expr condition = expression();
-        consume(TokenType.RIGHT_PAREN, "Expect ')' after if condition.");
+        consume(TokenType.RIGHT_PAREN, "Expected ')' after if condition.");
 
         Stmt thenBranch = statement();
         Stmt elseBranch = null;
@@ -128,13 +126,13 @@ class Parser {
     }
     private Stmt printStatement() {
         Expr value = expression();
-        consume(TokenType.EOL, "Expect new line after value.");
+        consume(TokenType.EOL, "Expected new line after value.");
         return new Stmt.Print(value);
     }
 
 
     private List<Stmt.Var> varDeclarations() {
-        Token name = consume(TokenType.IDENTIFIER, "Expect variable name.");
+        Token name = consume(TokenType.IDENTIFIER, "Expected variable name.");
 
         List <Stmt.Var> tempVars = new ArrayList<>();
 
@@ -149,7 +147,7 @@ class Parser {
         tempVars.add(new Stmt.Var(name, initializer, dataType));
 
         while(match(TokenType.COMMA)){
-            name = consume(TokenType.IDENTIFIER, "Expect a variable name");
+            name = consume(TokenType.IDENTIFIER, "Expected a variable name");
             initializer = null;
             if(match(TokenType.EQUAL)){
 
@@ -159,7 +157,7 @@ class Parser {
             tempVars.add(new Stmt.Var(name, initializer, dataType));
         }
 
-        consume(TokenType.AS, "Expect 'AS' after variable declaration.");
+        consume(TokenType.AS, "Expected 'AS' after variable declaration.");
 
         switch(peek().type){
             case INT:
@@ -184,7 +182,7 @@ class Parser {
         }
 
         if(!match(TokenType.INT,TokenType.FLOAT,TokenType.CHAR,TokenType.BOOLEAN,TokenType.STRING)){
-            throw error(peek(), "Expect Data Type");
+            throw error(peek(), "Expected Data Type");
         }
 
         List<Stmt.Var> vars = new ArrayList<>();
@@ -192,20 +190,20 @@ class Parser {
             vars.add(new Stmt.Var(v.name,v.initializer,dataType));
         }
 
-        consume(TokenType.EOL, "Expect new line after variable declaration.");
+        consume(TokenType.EOL, "Expected new line after variable declaration.");
         return vars;
     }
 
 
     private Stmt varDeclaration() {
-        Token name = consume(TokenType.IDENTIFIER, "Expect variable name.");
+        Token name = consume(TokenType.IDENTIFIER, "Expected variable name.");
         DataType dataType = DataType.INT;;
         Expr initializer = null;
         if (match(TokenType.EQUAL)) {
             initializer = expression();
         }
 
-        consume(TokenType.AS, "Expect 'AS' after variable declaration.");
+        consume(TokenType.AS, "Expected 'AS' after variable declaration.");
 
         switch(peek().type){
             case INT:
@@ -230,16 +228,16 @@ class Parser {
         }
 
         if(!match(TokenType.INT,TokenType.FLOAT,TokenType.CHAR,TokenType.BOOLEAN,TokenType.STRING)){
-            throw error(peek(), "Expect Data Type");
+            throw error(peek(), "Expected Data Type");
         }
 
-        consume(TokenType.EOL, "Expect new line after variable declaration.");
+        consume(TokenType.EOL, "Expected new line after variable declaration.");
         return new Stmt.Var(name, initializer, dataType);
     }
 
     private Stmt expressionStatement() {
         Expr expr = expression();
-        consume(TokenType.EOL, "Expect new line after expression.");
+        consume(TokenType.EOL, "Expected new line after expression.");
         return new Stmt.Expression(expr);
     }
 
@@ -250,7 +248,7 @@ class Parser {
             statements.add(declaration());
         }
 
-        consume(TokenType.RIGHT_BRACE, "Expect '}' after block.");
+        consume(TokenType.RIGHT_BRACE, "Expected '}' after block.");
         return statements;
     }
 
@@ -323,7 +321,7 @@ class Parser {
     }
 
     private Expr unary() {
-        if (match(TokenType.BANG, TokenType.MINUS)) {
+        if (match(TokenType.BANG, TokenType.MINUS, TokenType.PLUS)) {
             Token operator = previous();
             Expr right = unary();
             return new Expr.Unary(operator, right);
@@ -347,11 +345,11 @@ class Parser {
 
         if (match(TokenType.LEFT_PAREN)) {
             Expr expr = expression();
-            consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.");
+            consume(TokenType.RIGHT_PAREN, "Expected ')' after expression.");
             return new Expr.Grouping(expr);
         }
 
-        throw error(peek(), "Expect expression.");
+        throw error(peek(), "Expected expression.");
     }
 
 

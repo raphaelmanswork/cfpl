@@ -24,9 +24,6 @@ public class Program {
         errorOutput = "";
         run(source);
 
-
-//        if (hadError)  System.exit(65);
-//        if (hadRuntimeError) System.exit(70);
     }
 
 

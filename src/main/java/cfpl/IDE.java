@@ -24,7 +24,7 @@ public class IDE{
             public void actionPerformed(ActionEvent e) {
                 outputTxtArea.setText("");
                 Program.runProgram(inputTxtArea.getText());
-                setOutputTxt(Program.getOutput()+"\n\n"+"Success...");
+                setOutputTxt(Program.getOutput()+"\n\n"+"Finished interpreting...");
             }
         });
     }

@@ -99,6 +99,9 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             case MINUS:
                 checkNumberOperand(expr.operator, right);
                 return -(double) right;
+            case PLUS:
+                checkNumberOperand(expr.operator, right);
+                return Math.abs((double) right);
         }
 
         // Unreachable.

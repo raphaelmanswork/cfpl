@@ -244,45 +244,41 @@ public class CustomScanner {
 
     static {
         keywords = new HashMap<String, TokenType>();
+
+        // Logical Operators
         keywords.put("NOT",    TokenType.NOT);
         keywords.put("OR",     TokenType.OR);
         keywords.put("AND",    TokenType.AND);
+
+        // Control Structures
         keywords.put("WHILE",  TokenType.WHILE);
         keywords.put("IF",     TokenType.IF);
         keywords.put("ELSE",   TokenType.ELSE);
 
-        //CFPL
+        keywords.put("FALSE",  TokenType.FALSE);
+        keywords.put("TRUE",   TokenType.TRUE);
+
+
+        // Executable Block
         keywords.put("START",  TokenType.START);
         keywords.put("STOP",  TokenType.STOP);
 
-
-
         keywords.put("INPUT",  TokenType.INPUT);
         keywords.put("OUTPUT",  TokenType.PRINT);
-
         keywords.put("INPUT:",  TokenType.INPUT);
         keywords.put("OUTPUT:",  TokenType.PRINT);
-        keywords.put("VAR",    TokenType.VAR);
 
+        keywords.put("VAR",    TokenType.VAR);
         keywords.put("AS",    TokenType.AS);
-        keywords.put("INT",    TokenType.INT);
+
+        // Types
         keywords.put("FLOAT",    TokenType.FLOAT);
+        keywords.put("INT",    TokenType.INT);
         keywords.put("BOOL",    TokenType.BOOLEAN);
         keywords.put("CHAR",    TokenType.CHAR);
         keywords.put("STRING",    TokenType.STRING);
 
-
-        keywords.put("class",  TokenType.CLASS);
-        keywords.put("false",  TokenType.FALSE);
-        keywords.put("for",    TokenType.FOR);
-        keywords.put("fun",    TokenType.FUN);
-        keywords.put("nil",    TokenType.NIL);
-        keywords.put("print",  TokenType.PRINT);
-        keywords.put("return", TokenType.RETURN);
-        keywords.put("super",  TokenType.SUPER);
-        keywords.put("this",   TokenType.THIS);
-        keywords.put("true",   TokenType.TRUE);
-        keywords.put("var",    TokenType.VAR);
+        keywords.put("null",    TokenType.NIL);
 
     }
 
