@@ -31,12 +31,11 @@ public class Value {
 
         switch (type) {
             case INT:
-
                 if(value instanceof Double){
                     double test = (double) value;
                     if(test > 0){
                         test = (double) value - Math.round((double) value);
-                        if(test > 0){
+                        if(test != 0){
                             throw new NumberFormatException("Value is not int");
                         }
                     }

@@ -150,7 +150,6 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
                         fValue = value.charAt(0);
                     }
                 } else if (currValue.dataType == DataType.INT) {
-
                     double test = Double.parseDouble(value);
                     if (test > 0) {
                         test = test - Math.round(test);
