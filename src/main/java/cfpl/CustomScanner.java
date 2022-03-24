@@ -154,9 +154,13 @@ public class CustomScanner {
                 c == '_';
     }
 
+    private char previous() {
+        if (source.length() < 1) return '\0';
+        return source.charAt(current - 1);
+    }
 
     private void string() {
-        while (peek() != '"' && !isAtEnd()) {
+        while ((peek() == '"' && previous() == '[' && peekNext() == ']') || peek() != '"' && !isAtEnd()) {
             if (peek() == '\n') line++;
             advance();
         }
@@ -166,23 +170,21 @@ public class CustomScanner {
             return;
         }
 
-        // The closing ".
+
         advance();
 
-        // Trim the surrounding quotes.
         String value = source.substring(start + 1, current - 1);
-
+        value = value.replaceAll("(?<!\\[)#(?![\\w\\s]*[\\]])", "\n");
         Pattern regexOne = Pattern.compile("\\[(.*?]*)]");
         Matcher cgOne = regexOne.matcher(value);
 
         while (cgOne.find()) {
             String found = cgOne.group();
-            if(found != null){
+            if (found != null) {
                 String subs = found.substring(1, found.length() - 1);
                 value = value.replace(found, subs);
             }
         }
-
 
         if (value.equals("TRUE")) {
             addToken(TokenType.TRUE, true);
