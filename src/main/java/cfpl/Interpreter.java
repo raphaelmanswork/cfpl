@@ -52,19 +52,8 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
                         "Operands must be two numbers or two strings.");
             case MODULO:
                 //TODO: CHANGE LEXER TO DISTINGUISH INT OR DOUBLE
-                if (left.toString().endsWith(".0") && right.toString().endsWith(".0")) {
-                    return Double.valueOf((double) left).intValue() % Double.valueOf((double) right).intValue();
-                }
-
-                else if (left.toString().endsWith(".0") && (right instanceof Number && right.toString().endsWith(".0") || right instanceof Long)) {
-                    return Double.valueOf((double) left).intValue() % (Long) right;
-                }
-
-                else if ((left.toString().endsWith(".0") && left instanceof Number || left instanceof Long) && right.toString().endsWith(".0")) {
-                    return (Long) left % Double.valueOf((double) right).intValue();
-                }
-                else if(left instanceof  Long && right instanceof Long){
-                    return (Long) left % (Long) right;
+                if(left instanceof Integer && right instanceof Integer){
+                    return (int) left % (int) right;
                 }
                 throw new RuntimeError(expr.operator,
                         "Operands must be two integers");
@@ -206,14 +195,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
                         fValue = value.charAt(0);
                     }
                 } else if (currValue.dataType == DataType.INT) {
-                    double test = Double.parseDouble(value);
-                    if (test > 0) {
-                        test = test - Math.round(test);
-                        if (test > 0) {
-                            throw new NumberFormatException("Value is not int");
-                        }
-                    }
-                    fValue = Double.valueOf(Double.parseDouble(value)).intValue();
+                    fValue = Integer.valueOf(value);
                 } else if (currValue.dataType == DataType.BOOLEAN) {
                     fValue = Boolean.valueOf(value);
                 }

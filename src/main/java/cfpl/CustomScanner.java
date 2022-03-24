@@ -230,7 +230,14 @@ public class CustomScanner {
             while (isDigit(peek())) advance();
         }
 
-        addToken(TokenType.NUMBER, Double.parseDouble(source.substring(start, current)));
+        String s = source.substring(start, current);
+        double value = Double.parseDouble(s);
+        if(value - Math.round(value) == 0 && !s.contains(".")){
+            addToken(TokenType.NUMBER,(int) value);
+        }else{
+            addToken(TokenType.NUMBER,value);
+        }
+
     }
 
     private char peekNext() {
