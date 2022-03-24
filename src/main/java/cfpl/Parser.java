@@ -136,7 +136,7 @@ class Parser {
         consume(TokenType.RIGHT_PAREN, "Expect ')' after condition.");
         consume(TokenType.EOL, "Expect new line after ')'");
         Stmt body = statement();
-        consume(TokenType.EOL, "Expected new line after variable declaration."); // ADD NEW LINE
+        //consume(TokenType.EOL, "Expected new line after variable declaration."); // ADD NEW LINE
         System.out.println(body);
         System.out.println("whileStatement()");
         return new Stmt.While(condition, body);
