@@ -26,7 +26,7 @@ public class CustomScanner {
             scanToken();
             counter++;
         }
-        if(shouldAddNewLine() && tokens.get(tokens.size()-1).type != TokenType.STOP) {
+        if(shouldAddNewLine()) {
             addToken(TokenType.EOL);
         } //TODO
         tokens.add(new Token(TokenType.EOF, "", null, line));
@@ -246,7 +246,7 @@ public class CustomScanner {
         keywords = new HashMap<String, TokenType>();
 
         // Logical Operators
-        keywords.put("NOT",    TokenType.NOT);
+        keywords.put("NOT",    TokenType.BANG);
         keywords.put("OR",     TokenType.OR);
         keywords.put("AND",    TokenType.AND);
 
