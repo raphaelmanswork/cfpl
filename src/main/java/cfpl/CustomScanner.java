@@ -68,6 +68,9 @@ public class CustomScanner {
             case '+':
                 addToken(TokenType.PLUS);
                 break;
+            case '%':
+                addToken(TokenType.MODULO);
+                break;
             case ';':
                 addToken(TokenType.SEMICOLON);
                 break;

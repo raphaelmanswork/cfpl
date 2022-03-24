@@ -28,13 +28,8 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Object visitBinaryExpr(Expr.Binary expr) {
-        System.out.println("visitBinaryexpr");
         Object left = evaluate(expr.left);
         Object right = evaluate(expr.right);
-        System.out.println(left);
-        System.out.println(expr.operator.type);
-        System.out.println(right);
-        System.out.println(left == right);
         switch (expr.operator.type) {
             case AMPERSAND:
                 return left + "" + right;
@@ -48,6 +43,24 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
                 }
                 throw new RuntimeError(expr.operator,
                         "Operands must be two numbers or two strings.");
+            case MODULO:
+                //TODO: CHANGE LEXER TO DISTINGUISH INT OR DOUBLE
+                if (left.toString().endsWith(".0") && right.toString().endsWith(".0")) {
+                    return Double.valueOf((double) left).intValue() % Double.valueOf((double) right).intValue();
+                }
+
+                else if (left.toString().endsWith(".0") && (right instanceof Number && right.toString().endsWith(".0") || right instanceof Long)) {
+                    return Double.valueOf((double) left).intValue() % (Long) right;
+                }
+
+                else if ((left.toString().endsWith(".0") && left instanceof Number || left instanceof Long) && right.toString().endsWith(".0")) {
+                    return (Long) left % Double.valueOf((double) right).intValue();
+                }
+                else if(left instanceof  Long && right instanceof Long){
+                    return (Long) left % (Long) right;
+                }
+                throw new RuntimeError(expr.operator,
+                        "Operands must be two integers");
             case MINUS:
                 checkNumberOperands(expr.operator, left, right);
                 return Double.parseDouble(left.toString())  - Double.parseDouble(right.toString());
