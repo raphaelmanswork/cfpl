@@ -9,7 +9,6 @@ import cfpl.generated.Stmt;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 
 class Parser {
@@ -25,7 +24,7 @@ class Parser {
         List<Stmt> statements = new ArrayList<>();
         while (!isAtEnd()) {
             List<Stmt> declarations = declareMany();
-            if(declarations != null && declarations.size() > 0){
+            if (declarations != null && declarations.size() > 0) {
                 statements.addAll(declarations);
             }
         }
@@ -38,13 +37,16 @@ class Parser {
     }
 
 
-    private List<Stmt> declareMany(){
-        List<Stmt> stmts =  new ArrayList<>();
+    private List<Stmt> declareMany() {
+        List<Stmt> stmts = new ArrayList<>();
         try {
-            if (match(TokenType.VAR)){
-                List <Stmt.Var> vStmts = varDeclarations();
+            if (match(TokenType.VAR)) {
+                List<Stmt.Var> vStmts = varDeclarations();
                 stmts.addAll(vStmts);
-            }else{
+            } else if (match(TokenType.STAR)) {
+                comment();
+                return null;
+            } else {
                 stmts.add(statement());
             }
             return stmts;
@@ -54,18 +56,25 @@ class Parser {
         }
     }
 
+    private void comment() {
+            while (!check(TokenType.EOL) && !check(TokenType.EOF)) {
+                advance();
+            }
+            match(TokenType.EOL, TokenType.EOF);
+    }
+
     private Stmt statement() {
         if (match(TokenType.START)) return new Stmt.Block(executable());
         executeError = true;
-        throw error(peek(),"Expected to be wrapped in executable");
+        throw error(peek(), "Expected to be wrapped in executable");
     }
 
 
     private List<Token> input() {
         Token name = consume(TokenType.IDENTIFIER, "Expected variable name.");
-        List <Token> tokens = new ArrayList<>();
+        List<Token> tokens = new ArrayList<>();
         tokens.add(name);
-        while(match(TokenType.COMMA)){
+        while (match(TokenType.COMMA)) {
             tokens.add(consume(TokenType.IDENTIFIER, "Expected a variable name"));
         }
 
@@ -88,6 +97,10 @@ class Parser {
 
     private Stmt startStop() {
         try {
+            if (match(TokenType.STAR)){
+                comment();
+                return null;
+            }
             if (match(TokenType.INPUT)) return new Stmt.Input(input());
             if (match(TokenType.IF)) return ifStatement();
             if (match(TokenType.PRINT)) return printStatement();
@@ -114,6 +127,7 @@ class Parser {
 
         return new Stmt.If(condition, thenBranch, elseBranch);
     }
+
     private Stmt printStatement() {
         Expr value = expression();
         consume(TokenType.EOL, "Expected new line after value.");
@@ -124,11 +138,11 @@ class Parser {
     private List<Stmt.Var> varDeclarations() {
         Token name = consume(TokenType.IDENTIFIER, "Expected variable name.");
 
-        List <Stmt.Var> tempVars = new ArrayList<>();
+        List<Stmt.Var> tempVars = new ArrayList<>();
 
-        DataType dataType = DataType.NULL;;
+        DataType dataType = DataType.NULL;
+        ;
         Expr initializer = null;
-
 
 
         if (match(TokenType.EQUAL)) {
@@ -136,10 +150,10 @@ class Parser {
         }
         tempVars.add(new Stmt.Var(name, initializer, dataType));
 
-        while(match(TokenType.COMMA)){
+        while (match(TokenType.COMMA)) {
             name = consume(TokenType.IDENTIFIER, "Expected a variable name");
             initializer = null;
-            if(match(TokenType.EQUAL)){
+            if (match(TokenType.EQUAL)) {
 
                 initializer = expression();
 
@@ -149,7 +163,7 @@ class Parser {
 
         consume(TokenType.AS, "Expected 'AS' after variable declaration.");
 
-        switch(peek().type){
+        switch (peek().type) {
             case INT:
                 dataType = DataType.INT;
                 break;
@@ -171,13 +185,13 @@ class Parser {
                 break;
         }
 
-        if(!match(TokenType.INT,TokenType.FLOAT,TokenType.CHAR,TokenType.BOOLEAN,TokenType.STRING)){
+        if (!match(TokenType.INT, TokenType.FLOAT, TokenType.CHAR, TokenType.BOOLEAN, TokenType.STRING)) {
             throw error(peek(), "Expected Data Type");
         }
 
         List<Stmt.Var> vars = new ArrayList<>();
-        for(Stmt.Var v : tempVars){
-            vars.add(new Stmt.Var(v.name,v.initializer,dataType));
+        for (Stmt.Var v : tempVars) {
+            vars.add(new Stmt.Var(v.name, v.initializer, dataType));
         }
 
         consume(TokenType.EOL, "Expected new line after variable declaration.");
@@ -196,7 +210,7 @@ class Parser {
 
         while (!check(TokenType.RIGHT_BRACE) && !isAtEnd()) {
             List<Stmt> declarations = declareMany();
-            if(declarations != null){
+            if (declarations != null) {
                 statements.addAll(declarations);
             }
         }
@@ -213,7 +227,7 @@ class Parser {
             Expr value = assignment();
 
             if (expr instanceof Expr.Variable) {
-                Token name = ((Expr.Variable)expr).name;
+                Token name = ((Expr.Variable) expr).name;
                 return new Expr.Assign(name, value);
             }
 
@@ -234,6 +248,7 @@ class Parser {
 
         return expr;
     }
+
     private Expr and() {
         Expr expr = equality();
 
@@ -257,7 +272,6 @@ class Parser {
 
         return expr;
     }
-
 
 
     private Expr comparison() {
@@ -329,7 +343,6 @@ class Parser {
     }
 
 
-
     private boolean match(TokenType... types) {
         for (TokenType type : types) {
             if (check(type)) {
@@ -340,12 +353,12 @@ class Parser {
 
         return false;
     }
+
     private Token consume(TokenType type, String message) {
         if (check(type)) return advance();
         executeError = true;
         throw error(peek(), message);
     }
-
 
 
     private boolean check(TokenType type) {
@@ -372,13 +385,14 @@ class Parser {
 
     private ParseError error(Token token, String message) {
         boolean isReservedWord = CustomScanner.getReservedWords().get(token.lexeme) != null;
-        if(isReservedWord && !executeError){
+        if (isReservedWord && !executeError) {
             Program.error(token, "Is a reserved word");
-        }else{
+        } else {
             Program.error(token, message);
         }
         return new ParseError();
     }
+
     private void synchronize() {
         advance();
 

@@ -198,7 +198,9 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             this.environment = environment;
 
             for (Stmt statement : statements) {
-                execute(statement);
+                if(statement != null){
+                    execute(statement);
+                }
             }
         } finally {
             this.environment = previous;
