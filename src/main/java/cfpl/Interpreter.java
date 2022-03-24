@@ -28,15 +28,19 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Object visitBinaryExpr(Expr.Binary expr) {
+        System.out.println("visitBinaryexpr");
         Object left = evaluate(expr.left);
         Object right = evaluate(expr.right);
-
+        System.out.println(left);
+        System.out.println(expr.operator.type);
+        System.out.println(right);
+        System.out.println(left == right);
         switch (expr.operator.type) {
             case AMPERSAND:
                 return left + "" + right;
             case PLUS:
                 if (left instanceof Number && right instanceof Number) {
-                    return (double) left + (double) right;
+                    return Double.parseDouble(left.toString())  + Double.parseDouble(right.toString());
                 }
 
                 if (left instanceof String && right instanceof String) {
@@ -46,24 +50,24 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
                         "Operands must be two numbers or two strings.");
             case MINUS:
                 checkNumberOperands(expr.operator, left, right);
-                return (double) left - (double) right;
+                return Double.parseDouble(left.toString())  - Double.parseDouble(right.toString());
             case SLASH:
                 checkNumberOperands(expr.operator, left, right);
-                return (double) left / (double) right;
+                return Double.parseDouble(left.toString())  / Double.parseDouble(right.toString());
             case STAR:
                 checkNumberOperands(expr.operator, left, right);
-                return (double) left * (double) right;
+                return Double.parseDouble(left.toString())  * Double.parseDouble(right.toString());
             case GREATER:
                 checkNumberOperands(expr.operator, left, right);
-                return (double) left > (double) right;
+                return Double.parseDouble(left.toString())  > Double.parseDouble(right.toString());
             case GREATER_EQUAL:
-                return (double) left >= (double) right;
+                return Double.parseDouble(left.toString())  >= Double.parseDouble(right.toString());
             case LESS:
                 checkNumberOperands(expr.operator, left, right);
-                return (double) left < (double) right;
+                return Double.parseDouble(left.toString())  < Double.parseDouble(right.toString());
             case LESS_EQUAL:
                 checkNumberOperands(expr.operator, left, right);
-                return (double) left <= (double) right;
+                return Double.parseDouble(left.toString())  <= Double.parseDouble(right.toString());
             case BANG_EQUAL:
                 return !isEqual(left, right);
             case EQUAL_EQUAL:
@@ -76,8 +80,12 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     private void checkNumberOperands(Token operator,
                                      Object left, Object right) {
+        System.out.println(right.getClass());
         if (left instanceof Double && right instanceof Double) return;
-
+        if (left instanceof Number && right instanceof Number){
+            System.out.println("Integer");
+            return;
+        }
         throw new RuntimeError(operator, "Operands must be numbers.");
     }
 
@@ -89,6 +97,19 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Object visitLiteralExpr(Expr.Literal expr) {
         return expr.value;
+    }
+
+    @Override
+    public Object visitLogicalExpr(Expr.Logical expr) {
+        Object left = evaluate(expr.left);
+
+        if (expr.operator.type == TokenType.OR) {
+            if (isTruthy(left)) return left;
+        } else {
+            if (!isTruthy(left)) return left;
+        }
+
+        return evaluate(expr.right);
     }
 
     @Override
@@ -208,7 +229,9 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     private boolean isTruthy(Object object) {
+        System.out.println("false");
         if (object == null) return false;
+        System.out.println("true");
         if (object instanceof Boolean) return (boolean) object;
         return true;
     }
@@ -266,6 +289,18 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
 
         environment.define(stmt.name.lexeme, new Value(value, stmt.dataType));
+        return null;
+    }
+
+    @Override
+    public Void visitWhileStmt(Stmt.While stmt) {
+        System.out.println("visitWhileStmt");
+        while (isTruthy(evaluate(stmt.condition))) {
+            execute(stmt.body);
+            System.out.println("visitWhileStmt");
+        }
+        System.out.println(( evaluate(stmt.condition)));
+        System.out.println("afterIsTruthy");
         return null;
     }
 
