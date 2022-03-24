@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CustomScanner {
     private final String source;
@@ -26,7 +28,7 @@ public class CustomScanner {
             scanToken();
             counter++;
         }
-        if(shouldAddNewLine()) {
+        if (shouldAddNewLine()) {
             addToken(TokenType.EOL);
         } //TODO
         tokens.add(new Token(TokenType.EOF, "", null, line));
@@ -79,6 +81,8 @@ public class CustomScanner {
                 break;
             case '/':
                 addToken(TokenType.SLASH);
+            case '#':
+                addToken(TokenType.CARRIAGE);
                 break;
             case '!':
                 addToken(match('=') ? TokenType.BANG_EQUAL : TokenType.BANG);
@@ -99,10 +103,10 @@ public class CustomScanner {
                 break;
 
             case '\n':
-                if(shouldAddNewLine()) {
+                if (shouldAddNewLine()) {
                     addToken(TokenType.EOL);
                 }
-                 // TODO
+                // TODO
                 line++;
                 break;
 
@@ -124,13 +128,13 @@ public class CustomScanner {
         }
     }
 
-    private boolean shouldAddNewLine(){
-        return tokens.size() >= 1 &&tokens.get(tokens.size()-1).type != TokenType.EOL;
+    private boolean shouldAddNewLine() {
+        return tokens.size() >= 1 && tokens.get(tokens.size() - 1).type != TokenType.EOL;
     }
 
     private void identifier() {
         while (isAlphaNumeric(peek())) advance();
-        if(peek() == ':'){
+        if (peek() == ':') {
             advance();
         }
 
@@ -167,11 +171,24 @@ public class CustomScanner {
 
         // Trim the surrounding quotes.
         String value = source.substring(start + 1, current - 1);
-        if(value.equals("TRUE")){
+
+        Pattern regexOne = Pattern.compile("\\[(.*?]*)]");
+        Matcher cgOne = regexOne.matcher(value);
+
+        while (cgOne.find()) {
+            String found = cgOne.group();
+            if(found != null){
+                String subs = found.substring(1, found.length() - 1);
+                value = value.replace(found, subs);
+            }
+        }
+
+
+        if (value.equals("TRUE")) {
             addToken(TokenType.TRUE, true);
-        }else if(value.equals("FALSE")){
+        } else if (value.equals("FALSE")) {
             addToken(TokenType.FALSE, false);
-        }else{
+        } else {
             addToken(TokenType.STRING, value);
         }
     }
@@ -190,7 +207,7 @@ public class CustomScanner {
 
         // The closing '.
         char closing = advance();
-        if(closing != '\''){
+        if (closing != '\'') {
             Program.error(line, "Invalid character");
 
             return;
@@ -255,43 +272,43 @@ public class CustomScanner {
         keywords = new HashMap<String, TokenType>();
 
         // Logical Operators
-        keywords.put("NOT",    TokenType.BANG);
-        keywords.put("OR",     TokenType.OR);
-        keywords.put("AND",    TokenType.AND);
+        keywords.put("NOT", TokenType.BANG);
+        keywords.put("OR", TokenType.OR);
+        keywords.put("AND", TokenType.AND);
 
         // Control Structures
-        keywords.put("WHILE",  TokenType.WHILE);
-        keywords.put("IF",     TokenType.IF);
-        keywords.put("ELSE",   TokenType.ELSE);
+        keywords.put("WHILE", TokenType.WHILE);
+        keywords.put("IF", TokenType.IF);
+        keywords.put("ELSE", TokenType.ELSE);
 
-        keywords.put("FALSE",  TokenType.FALSE);
-        keywords.put("TRUE",   TokenType.TRUE);
+        keywords.put("FALSE", TokenType.FALSE);
+        keywords.put("TRUE", TokenType.TRUE);
 
 
         // Executable Block
-        keywords.put("START",  TokenType.START);
-        keywords.put("STOP",  TokenType.STOP);
+        keywords.put("START", TokenType.START);
+        keywords.put("STOP", TokenType.STOP);
 
-        keywords.put("INPUT",  TokenType.INPUT);
-        keywords.put("OUTPUT",  TokenType.PRINT);
-        keywords.put("INPUT:",  TokenType.INPUT);
-        keywords.put("OUTPUT:",  TokenType.PRINT);
+        keywords.put("INPUT", TokenType.INPUT);
+        keywords.put("OUTPUT", TokenType.PRINT);
+        keywords.put("INPUT:", TokenType.INPUT);
+        keywords.put("OUTPUT:", TokenType.PRINT);
 
-        keywords.put("VAR",    TokenType.VAR);
-        keywords.put("AS",    TokenType.AS);
+        keywords.put("VAR", TokenType.VAR);
+        keywords.put("AS", TokenType.AS);
 
         // Types
-        keywords.put("FLOAT",    TokenType.FLOAT);
-        keywords.put("INT",    TokenType.INT);
-        keywords.put("BOOL",    TokenType.BOOLEAN);
-        keywords.put("CHAR",    TokenType.CHAR);
-        keywords.put("STRING",    TokenType.STRING);
+        keywords.put("FLOAT", TokenType.FLOAT);
+        keywords.put("INT", TokenType.INT);
+        keywords.put("BOOL", TokenType.BOOLEAN);
+        keywords.put("CHAR", TokenType.CHAR);
+        keywords.put("STRING", TokenType.STRING);
 
-        keywords.put("null",    TokenType.NIL);
+        keywords.put("null", TokenType.NIL);
 
     }
 
-    public static Map<String, TokenType> getReservedWords(){
+    public static Map<String, TokenType> getReservedWords() {
         return keywords;
     }
 }
