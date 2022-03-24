@@ -28,8 +28,16 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Object visitBinaryExpr(Expr.Binary expr) {
+        System.out.println("visitBinaryexpr");
         Object left = evaluate(expr.left);
         Object right = evaluate(expr.right);
+<<<<<<< HEAD
+=======
+        System.out.println(left);
+        System.out.println(expr.operator.type);
+        System.out.println(right);
+        System.out.println(left == right);
+>>>>>>> 28f415a (while looop)
         switch (expr.operator.type) {
             case AMPERSAND:
                 return left + "" + right;
@@ -115,6 +123,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Object visitLogicalExpr(Expr.Logical expr) {
         Object left = evaluate(expr.left);
+<<<<<<< HEAD
         Object right = evaluate(expr.right);
 
 
@@ -122,6 +131,8 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             throw new RuntimeError(expr.operator, "Operands are not an instances of Boolean");
         }
 
+=======
+>>>>>>> 28f415a (while looop)
 
         if (expr.operator.type == TokenType.OR) {
             if (isTruthy(left)) return left;
@@ -129,10 +140,14 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             if (!isTruthy(left)) return left;
         }
 
+<<<<<<< HEAD
 
 
 
         return right;
+=======
+        return evaluate(expr.right);
+>>>>>>> 28f415a (while looop)
     }
 
     @Override
