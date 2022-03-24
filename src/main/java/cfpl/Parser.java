@@ -9,6 +9,7 @@ import cfpl.generated.Stmt;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 class Parser {
@@ -37,24 +38,12 @@ class Parser {
     }
 
 
-    private Stmt declaration() {
-        try {
-            if (match(TokenType.VAR)) return varDeclaration();
-            return statement();
-        } catch (ParseError error) {
-            synchronize();
-            return null;
-        }
-    }
-
     private List<Stmt> declareMany(){
         List<Stmt> stmts =  new ArrayList<>();
         try {
             if (match(TokenType.VAR)){
                 List <Stmt.Var> vStmts = varDeclarations();
-                for(Stmt.Var var : vStmts){
-                    stmts.add(var);
-                }
+                stmts.addAll(vStmts);
             }else{
                 stmts.add(statement());
             }
@@ -66,11 +55,11 @@ class Parser {
     }
 
     private Stmt statement() {
-        if (match(TokenType.IF)) return ifStatement();
         if (match(TokenType.START)) return new Stmt.Block(executable());
         executeError = true;
         throw error(peek(),"Expected to be wrapped in executable");
     }
+
 
     private List<Token> input() {
         Token name = consume(TokenType.IDENTIFIER, "Expected variable name.");
@@ -100,7 +89,6 @@ class Parser {
     private Stmt startStop() {
         try {
             if (match(TokenType.INPUT)) return new Stmt.Input(input());
-            if (match(TokenType.VAR)) return varDeclaration();
             if (match(TokenType.IF)) return ifStatement();
             if (match(TokenType.PRINT)) return printStatement();
             if (match(TokenType.LEFT_BRACE)) return new Stmt.Block(block());
@@ -116,10 +104,11 @@ class Parser {
         consume(TokenType.LEFT_PAREN, "Expected '(' after 'if'.");
         Expr condition = expression();
         consume(TokenType.RIGHT_PAREN, "Expected ')' after if condition.");
-
+        consume(TokenType.EOL, "Expected new line after value.");
         Stmt thenBranch = statement();
         Stmt elseBranch = null;
         if (match(TokenType.ELSE)) {
+            consume(TokenType.EOL, "Expected new line after value.");
             elseBranch = statement();
         }
 
@@ -196,46 +185,6 @@ class Parser {
     }
 
 
-    private Stmt varDeclaration() {
-        Token name = consume(TokenType.IDENTIFIER, "Expected variable name.");
-        DataType dataType = DataType.INT;;
-        Expr initializer = null;
-        if (match(TokenType.EQUAL)) {
-            initializer = expression();
-        }
-
-        consume(TokenType.AS, "Expected 'AS' after variable declaration.");
-
-        switch(peek().type){
-            case INT:
-                dataType = DataType.INT;
-                break;
-            case CHAR:
-                dataType = DataType.CHAR;
-                break;
-
-            case BOOLEAN:
-                dataType = DataType.BOOLEAN;
-                break;
-
-            case FLOAT:
-                dataType = DataType.FLOAT;
-                break;
-            case STRING:
-                dataType = DataType.STRING;
-                break;
-            default:
-                break;
-        }
-
-        if(!match(TokenType.INT,TokenType.FLOAT,TokenType.CHAR,TokenType.BOOLEAN,TokenType.STRING)){
-            throw error(peek(), "Expected Data Type");
-        }
-
-        consume(TokenType.EOL, "Expected new line after variable declaration.");
-        return new Stmt.Var(name, initializer, dataType);
-    }
-
     private Stmt expressionStatement() {
         Expr expr = expression();
         consume(TokenType.EOL, "Expected new line after expression.");
@@ -246,7 +195,10 @@ class Parser {
         List<Stmt> statements = new ArrayList<>();
 
         while (!check(TokenType.RIGHT_BRACE) && !isAtEnd()) {
-            statements.add(declaration());
+            List<Stmt> declarations = declareMany();
+            if(declarations != null){
+                statements.addAll(declarations);
+            }
         }
 
         consume(TokenType.RIGHT_BRACE, "Expected '}' after block.");
