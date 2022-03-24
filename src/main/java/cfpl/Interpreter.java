@@ -115,6 +115,13 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Object visitLogicalExpr(Expr.Logical expr) {
         Object left = evaluate(expr.left);
+        Object right = evaluate(expr.right);
+
+
+        if(!(left instanceof Boolean && right instanceof Boolean)){
+            throw new RuntimeError(expr.operator, "Operands are not an instances of Boolean");
+        }
+
 
         if (expr.operator.type == TokenType.OR) {
             if (isTruthy(left)) return left;
@@ -122,7 +129,10 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             if (!isTruthy(left)) return left;
         }
 
-        return evaluate(expr.right);
+
+
+
+        return right;
     }
 
     @Override
@@ -246,6 +256,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         if (object == null) return false;
         System.out.println("true");
         if (object instanceof Boolean) return (boolean) object;
+
         return true;
     }
 

@@ -167,7 +167,13 @@ public class CustomScanner {
 
         // Trim the surrounding quotes.
         String value = source.substring(start + 1, current - 1);
-        addToken(TokenType.STRING, value);
+        if(value.equals("TRUE")){
+            addToken(TokenType.TRUE, true);
+        }else if(value.equals("FALSE")){
+            addToken(TokenType.FALSE, false);
+        }else{
+            addToken(TokenType.STRING, value);
+        }
     }
 
     private void character() {
