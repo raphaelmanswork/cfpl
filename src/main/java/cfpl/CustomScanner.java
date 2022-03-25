@@ -181,6 +181,9 @@ public class CustomScanner {
 
         while (cgOne.find()) {
             String found = cgOne.group();
+            if(found != null && found.length() > 3){
+                Program.error(new Token(TokenType.STRING,value,value,line),"Cannot use escape code on strings");
+            }
             if (found != null) {
                 String subs = found.substring(1, found.length() - 1);
                 value = value.replace(found, subs);
