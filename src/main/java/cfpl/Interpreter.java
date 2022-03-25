@@ -216,7 +216,13 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
                 } else if (currValue.dataType == DataType.INT) {
                     fValue = Integer.valueOf(value);
                 } else if (currValue.dataType == DataType.BOOLEAN) {
-                    fValue = Boolean.valueOf(value);
+                    if(value.contains("TRUE")){
+                        fValue = true;
+                    }else if(value.contains("FALSE")){
+                        fValue = false;
+                    }else{
+                        throw new ClassCastException("Not a boolean");
+                    }
                 }
             } catch (ClassCastException | NumberFormatException e) {
                 System.out.println(e);
