@@ -81,6 +81,7 @@ public class CustomScanner {
                 break;
             case '/':
                 addToken(TokenType.SLASH);
+                break;
             case '#':
                 addToken(TokenType.CARRIAGE);
                 break;

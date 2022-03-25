@@ -41,17 +41,16 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             case AMPERSAND:
                 return left + "" + right;
             case PLUS:
-                if (left instanceof Number && right instanceof Number) {
-                    return Double.parseDouble(left.toString())  + Double.parseDouble(right.toString());
+                if (left instanceof Integer && right instanceof Integer) {
+                    return (int) left + (int) right;
                 }
 
-                if (left instanceof String && right instanceof String) {
-                    return (String) left + (String) right;
+                if (left instanceof Number && right instanceof Number) {
+                    return ((Number) left).doubleValue() + ((Number) right).doubleValue();
                 }
                 throw new RuntimeError(expr.operator,
                         "Operands must be two numbers or two strings.");
             case MODULO:
-                //TODO: CHANGE LEXER TO DISTINGUISH INT OR DOUBLE
                 if(left instanceof Integer && right instanceof Integer){
                     return (int) left % (int) right;
                 }
@@ -59,13 +58,28 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
                         "Operands must be two integers");
             case MINUS:
                 checkNumberOperands(expr.operator, left, right);
-                return Double.parseDouble(left.toString())  - Double.parseDouble(right.toString());
+
+                if (left instanceof Integer && right instanceof Integer) {
+                    return (int) left - (int) right;
+                }
+
+                return ((Number) left).doubleValue() - ((Number) right).doubleValue();
+
             case SLASH:
                 checkNumberOperands(expr.operator, left, right);
-                return Double.parseDouble(left.toString())  / Double.parseDouble(right.toString());
+                if (left instanceof Integer && right instanceof Integer) {
+                    return (int) left / (int) right;
+                }
+
+                return ((Number) left).doubleValue() / ((Number) right).doubleValue();
             case STAR:
                 checkNumberOperands(expr.operator, left, right);
-                return Double.parseDouble(left.toString())  * Double.parseDouble(right.toString());
+                if (left instanceof Integer && right instanceof Integer) {
+                    return (int) left * (int) right;
+                }
+
+                return ((Number) left).doubleValue() * ((Number) right).doubleValue();
+
             case GREATER:
                 checkNumberOperands(expr.operator, left, right);
                 return Double.parseDouble(left.toString())  > Double.parseDouble(right.toString());
@@ -144,18 +158,23 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
                 return !isTruthy(right);
             case MINUS:
                 checkNumberOperand(expr.operator, right);
+                if(right instanceof Integer){
+                    return -(int) right;
+                }
                 return -(double) right;
             case PLUS:
                 checkNumberOperand(expr.operator, right);
+                if(right instanceof Integer){
+                    return Math.abs((int) right);
+                }
                 return Math.abs((double) right);
         }
 
-        // Unreachable.
         return null;
     }
 
     private void checkNumberOperand(Token operator, Object operand) {
-        if (operand instanceof Double) return;
+        if (operand instanceof Number) return;
         throw new RuntimeError(operator, "Operand must be a number.");
     }
 
