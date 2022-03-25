@@ -47,7 +47,7 @@ public class Value {
                 }
                 break;
             case FLOAT:
-                fValue = (double) value;
+                fValue = ((Number) value).doubleValue();
                 break;
             case STRING:
                 fValue = (String) value;
