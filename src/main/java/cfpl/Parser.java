@@ -15,13 +15,13 @@ class Parser {
     private final List<Token> tokens;
     private int current = 0;
     boolean executeError = false;
-
+    List<Stmt> statements = new ArrayList<>();
     Parser(List<Token> tokens) {
         this.tokens = tokens;
     }
 
     List<Stmt> parse() {
-        List<Stmt> statements = new ArrayList<>();
+
         while (!isAtEnd()) {
             List<Stmt> declarations = declareMany();
             if (declarations != null && declarations.size() > 0) {
@@ -66,7 +66,7 @@ class Parser {
     private Stmt statement() {
 
         if (match(TokenType.IF)) return ifStatement();
-        if (match(TokenType.START)) return new Stmt.Block(executable());
+        if (match(TokenType.START)) return new Stmt.Executable(executable());
         executeError = true;
         throw error(peek(), "Expected to be wrapped in executable");
     }
@@ -118,7 +118,7 @@ class Parser {
             if (match(TokenType.LEFT_BRACE)) return new Stmt.Block(block());
             if (match(TokenType.START)){
                 System.out.println("STARTSTOP START");
-                return new Stmt.Block(executable());
+                return new Stmt.Executable(executable());
             }
             //if (match(TokenType.EOL)) consume(TokenType.EOL, "f");
             System.out.println("START STOP EXPRESSIONSTATEMENT");
@@ -164,6 +164,13 @@ class Parser {
 
 
     private List<Stmt.Var> varDeclarations() {
+        for (Stmt stmt: statements){
+            String cName = stmt.getClass().getName();
+            if(cName.contains("Executable")){
+                executeError = true;
+                throw error(previous(),"Variable declarations should be on top");
+            }
+        }
         Token name = consume(TokenType.IDENTIFIER, "Expected variable name.");
 
         List<Stmt.Var> tempVars = new ArrayList<>();
@@ -384,6 +391,10 @@ class Parser {
 
         //if (match(TokenType.EOL)) System.out.println("END OF LINE");
         //return null;
+        executeError = true;
+        if(peek().type == TokenType.VAR){
+            throw error(peek(),"Variable declarations should be on top");
+        }
         throw error(peek(), "Expected expression.");
     }
 

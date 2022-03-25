@@ -92,7 +92,13 @@ public class CustomScanner {
                 addToken(match('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL);
                 break;
             case '<':
-                addToken(match('=') ? TokenType.LESS_EQUAL : TokenType.LESS);
+                char next = peek();
+                if(next=='>'){
+                    addToken(TokenType.BANG_EQUAL);
+                    current++;
+                }else{
+                    addToken(match('=') ? TokenType.LESS_EQUAL : TokenType.LESS);
+                }
                 break;
             case '>':
                 addToken(match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER);
@@ -278,6 +284,7 @@ public class CustomScanner {
         current++;
         return true;
     }
+
 
     private static final Map<String, TokenType> keywords;
 

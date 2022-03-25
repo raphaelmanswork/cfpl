@@ -281,7 +281,6 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     private boolean isEqual(Object a, Object b) {
         if (a == null && b == null) return true;
         if (a == null) return false;
-
         return a.equals(b);
     }
 
