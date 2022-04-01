@@ -19,7 +19,9 @@
             <preferred-size width="150" height="50"/>
           </grid>
         </constraints>
-        <properties/>
+        <properties>
+          <font name="Courier New" size="16"/>
+        </properties>
       </component>
       <hspacer id="ec0f7">
         <constraints>
@@ -34,6 +36,7 @@
         </constraints>
         <properties>
           <editable value="false"/>
+          <font name="Courier New" size="16"/>
         </properties>
       </component>
       <component id="ca2e5" class="javax.swing.JButton" binding="runButton" default-binding="true">
