@@ -108,21 +108,15 @@ class Parser {
             if (match(TokenType.INPUT)) return new Stmt.Input(input());
             if (match(TokenType.IF)) return ifStatement();
             if (match(TokenType.PRINT)){
-                System.out.println("STARTSTOP PRINT");
                 return printStatement();
             }
             if (match(TokenType.WHILE)){
-                System.out.println("STARTSTOP WHILE");
                 return whileStatement();
             }
             if (match(TokenType.LEFT_BRACE)) return new Stmt.Block(block());
             if (match(TokenType.START)){
-                System.out.println("STARTSTOP START");
                 return new Stmt.Executable(executable());
             }
-            //if (match(TokenType.EOL)) consume(TokenType.EOL, "f");
-            System.out.println("START STOP EXPRESSIONSTATEMENT");
-            //return null;
             return expressionStatement();
         } catch (ParseError error) {
             synchronize();
@@ -132,13 +126,9 @@ class Parser {
     private Stmt whileStatement(){
        consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.");
         Expr condition = expression();
-        System.out.println("FFFFF"+condition);
         consume(TokenType.RIGHT_PAREN, "Expect ')' after condition.");
         consume(TokenType.EOL, "Expect new line after ')'");
         Stmt body = statement();
-        //consume(TokenType.EOL, "Expected new line after variable declaration."); // ADD NEW LINE
-        System.out.println(body);
-        System.out.println("whileStatement()");
         return new Stmt.While(condition, body);
     }
     private Stmt ifStatement() {
@@ -235,9 +225,7 @@ class Parser {
 
 
     private Stmt expressionStatement() {
-        System.out.println("Expression Statement");
         Expr expr = expression();
-        System.out.println(expr);
         consume(TokenType.EOL, "Expected new line after expression.");
         return new Stmt.Expression(expr);
     }
@@ -299,15 +287,12 @@ class Parser {
     }
 
     private Expr equality() {
-        System.out.println("equality()");
         Expr expr = comparison();
 
         while (match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL)) {
-            System.out.println("Bang equal");
             Token operator = previous();
             Expr right = comparison();
             expr = new Expr.Binary(expr, operator, right);
-            System.out.println(expr);
         }
 
         return expr;
@@ -315,9 +300,7 @@ class Parser {
 
 
     private Expr comparison() {
-        System.out.println("comparison");
         Expr expr = term();
-        System.out.println(expr);
         while (match(TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL)) {
             Token operator = previous();
             Expr right = term();
@@ -328,7 +311,6 @@ class Parser {
     }
 
     private Expr term() {
-        System.out.println("term");
         Expr expr = factor();
 
         while (match(TokenType.MINUS, TokenType.PLUS, TokenType.AMPERSAND, TokenType.MODULO)) {
@@ -341,7 +323,6 @@ class Parser {
     }
 
     private Expr factor() {
-        System.out.println("factor()");
         Expr expr = unary();
 
         while (match(TokenType.SLASH, TokenType.STAR)) {
@@ -354,7 +335,6 @@ class Parser {
     }
 
     private Expr unary() {
-        System.out.println("unary()");
         if (match(TokenType.BANG, TokenType.MINUS, TokenType.PLUS)) {
             Token operator = previous();
             Expr right = unary();
@@ -365,15 +345,11 @@ class Parser {
     }
 
     private Expr primary() {
-        System.out.println("primary");
-        System.out.println(tokens.get(current));
         if (match(TokenType.FALSE)) return new Expr.Literal(false);
         if (match(TokenType.TRUE)) return new Expr.Literal(true);
         if (match(TokenType.NIL)) return new Expr.Literal(null);
 
         if (match(TokenType.NUMBER, TokenType.STRING, TokenType.CHAR, TokenType.BOOLEAN)) {
-            System.out.println("matched 4");
-            System.out.println();
             return new Expr.Literal(previous().literal);
         }
 
@@ -383,14 +359,11 @@ class Parser {
         }
 
         if (match(TokenType.LEFT_PAREN)) {
-            System.out.println("left paren");
             Expr expr = expression();
             consume(TokenType.RIGHT_PAREN, "Expected ')' after expression.");
             return new Expr.Grouping(expr);
         }
 
-        //if (match(TokenType.EOL)) System.out.println("END OF LINE");
-        //return null;
         executeError = true;
         if(peek().type == TokenType.VAR){
             throw error(peek(),"Variable declarations should be on top");

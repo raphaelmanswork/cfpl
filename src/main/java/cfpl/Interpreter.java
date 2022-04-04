@@ -28,14 +28,9 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Object visitBinaryExpr(Expr.Binary expr) {
-        System.out.println("visitBinaryexpr");
         Object left = evaluate(expr.left);
         Object right = evaluate(expr.right);
 
-        System.out.println(left);
-        System.out.println(expr.operator.type);
-        System.out.println(right);
-        System.out.println(left == right);
 
         switch (expr.operator.type) {
             case AMPERSAND:
@@ -106,7 +101,6 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         System.out.println(right.getClass());
         if (left instanceof Double && right instanceof Double) return;
         if (left instanceof Number && right instanceof Number){
-            System.out.println("Integer");
             return;
         }
         throw new RuntimeError(operator, "Operands must be numbers.");
@@ -270,9 +264,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     private boolean isTruthy(Object object) {
-        System.out.println("false");
         if (object == null) return false;
-        System.out.println("true");
         if (object instanceof Boolean) return (boolean) object;
 
         return true;
@@ -335,13 +327,9 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitWhileStmt(Stmt.While stmt) {
-        System.out.println("visitWhileStmt");
         while (isTruthy(evaluate(stmt.condition))) {
             execute(stmt.body);
-            System.out.println("visitWhileStmt");
         }
-        System.out.println(( evaluate(stmt.condition)));
-        System.out.println("afterIsTruthy");
         return null;
     }
 
