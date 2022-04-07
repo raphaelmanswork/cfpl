@@ -11,16 +11,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-class Parser {
+public class Parser {
     private final List<Token> tokens;
     private int current = 0;
     boolean executeError = false;
     List<Stmt> statements = new ArrayList<>();
-    Parser(List<Token> tokens) {
+    public Parser(List<Token> tokens) {
         this.tokens = tokens;
     }
 
-    List<Stmt> parse() {
+    public List<Stmt> parse() {
 
         while (!isAtEnd()) {
             List<Stmt> declarations = declareMany();

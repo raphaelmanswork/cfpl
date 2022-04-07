@@ -10,20 +10,17 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
-class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
+public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     private ArrayList<String> outputList = new ArrayList<>();
     private Environment environment = new Environment();
 
 
-    void interpret(List<Stmt> statements) {
-        try {
-            for (Stmt statement : statements) {
-                execute(statement);
-            }
-        } catch (RuntimeError error) {
-            Program.runtimeError(error);
+    public ArrayList<String> interpret(List<Stmt> statements) {
+        for (Stmt statement : statements) {
+            execute(statement);
         }
+        return outputList;
     }
 
     @Override
@@ -359,7 +356,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         outputList = new ArrayList<>();
     }
 
-    void resetEnvironment(){
+    public void resetEnvironment(){
         environment = new Environment();
     }
 }

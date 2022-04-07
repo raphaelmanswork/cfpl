@@ -40,9 +40,12 @@ public class Program {
 
 
         if (hadError) return;
-
         interpreter.resetEnvironment();
-        interpreter.interpret(statements);
+        try{
+             interpreter.interpret(statements);
+        } catch (RuntimeError error) {
+            Program.runtimeError(error);
+        }
     }
 
 

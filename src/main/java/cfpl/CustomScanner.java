@@ -16,11 +16,11 @@ public class CustomScanner {
     private int current = 0;
     private int line = 1;
 
-    CustomScanner(String source) {
+    public CustomScanner(String source) {
         this.source = source;
     }
 
-    List<Token> scanTokens() {
+    public List<Token> scanTokens() {
         int counter = 0;
         while (!isAtEnd()) {
             // We are at the beginning of the next lexeme.
