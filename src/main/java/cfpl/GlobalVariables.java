@@ -7,18 +7,13 @@ import cfpl.generated.Stmt;
 import java.util.HashMap;
 import java.util.Map;
 
-class Environment {
+class GlobalVariables {
     private final Map<String, Value> values = new HashMap<>();
-    final Environment enclosing;
+    final GlobalVariables enclosing;
 
-    Environment() {
+    GlobalVariables() {
         enclosing = null;
     }
-
-    Environment(Environment enclosing) {
-        this.enclosing = enclosing;
-    }
-
 
     void define(Stmt.Var stmt, Object value) {
         String name = stmt.name.lexeme;

@@ -3,11 +3,9 @@ package cfpl;
 
 import cfpl.ErrorHandler.RuntimeError;
 import cfpl.enums.TokenType;
-import cfpl.generated.Expr;
 import cfpl.generated.Stmt;
 
 import java.util.List;
-import java.util.Scanner;
 
 public class Program {
     public static IDE ide = new IDE();
@@ -28,7 +26,7 @@ public class Program {
 
 
     private static void run (String source){
-        CustomScanner scanner = new CustomScanner(source);
+        LexerScanner scanner = new LexerScanner(source);
         List<Token> tokens = scanner.scanTokens();
 
         for(Token tk : tokens){

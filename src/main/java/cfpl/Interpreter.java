@@ -13,7 +13,7 @@ import java.util.List;
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     private ArrayList<String> outputList = new ArrayList<>();
-    private Environment environment = new Environment();
+    private GlobalVariables globalVariables = new GlobalVariables();
 
 
     public ArrayList<String> interpret(List<Stmt> statements) {
@@ -192,7 +192,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             String value = values[i];
             Token t = input.tokens.get(i);
             Expr.Variable var = new Expr.Variable(t);
-            Value currValue = environment.get(var.name);
+            Value currValue = globalVariables.get(var.name);
 
 
             try {
@@ -221,7 +221,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             } catch (NullPointerException e) {
                 fValue = null;
             }
-            environment.assign(var.name, fValue);
+            globalVariables.assign(var.name, fValue);
         }
         return null;
     }
@@ -300,7 +300,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             value = evaluate(stmt.initializer);
         }
 
-        environment.define(stmt, value);
+        globalVariables.define(stmt, value);
         return null;
     }
 
@@ -325,13 +325,13 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Object visitAssignExpr(Expr.Assign expr) {
         Object value = evaluate(expr.value);
-        environment.assign(expr.name, value);
+        globalVariables.assign(expr.name, value);
         return value;
     }
 
     @Override
     public Object visitVariableExpr(Expr.Variable expr) {
-        return environment.get(expr.name).value;
+        return globalVariables.get(expr.name).value;
     }
 
     public String getOutputList() {
@@ -349,6 +349,6 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     public void resetEnvironment(){
-        environment = new Environment();
+        globalVariables = new GlobalVariables();
     }
 }

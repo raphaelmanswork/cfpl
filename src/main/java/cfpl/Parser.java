@@ -127,23 +127,23 @@ public class Parser {
         }
     }
     private Stmt whileStatement(){
-       consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.");
+       consume(TokenType.LEFT_PAREN, "Expected '(' after 'while'.");
         Expr condition = expression();
-        consume(TokenType.RIGHT_PAREN, "Expect ')' after condition.");
-        consume(TokenType.EOL, "Expect new line after ')'");
+        consume(TokenType.RIGHT_PAREN, "Expected ')' after condition.");
+        consume(TokenType.EOL, "Expected new line after ')'");
         Stmt body = statement();
         return new Stmt.While(condition, body);
     }
 
     private Stmt forStatement(){
-        consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.");
+        consume(TokenType.LEFT_PAREN, "Expected '(' after 'while'.");
         Expr init = expression();
         consume(TokenType.SEMICOLON, "Expected semi-colon");
         Expr condition = expression();
         consume(TokenType.SEMICOLON, "Expected semi-colon");
         Expr updateStmt = expression();
-        consume(TokenType.RIGHT_PAREN, "Expect ')' after condition.");
-        consume(TokenType.EOL, "Expect new line after ')'");
+        consume(TokenType.RIGHT_PAREN, "Expected ')' after condition.");
+        consume(TokenType.EOL, "Expected new line after ')'");
         Stmt body = statement();
         return new Stmt.For(init,condition,new Stmt.Expression(updateStmt), body);
     }
@@ -431,7 +431,7 @@ public class Parser {
     }
 
     private ParseError error(Token token, String message) {
-        boolean isReservedWord = CustomScanner.getReservedWords().get(token.lexeme) != null;
+        boolean isReservedWord = LexerScanner.getReservedWords().get(token.lexeme) != null;
         if (isReservedWord && !executeError) {
             Program.error(token, "Is a reserved word");
         } else {

@@ -1,14 +1,11 @@
 package test_cases;
 
-import cfpl.CustomScanner;
-import cfpl.ErrorHandler.RuntimeError;
+import cfpl.LexerScanner;
 import cfpl.Interpreter;
 import cfpl.Parser;
 import cfpl.Token;
 import cfpl.generated.Stmt;
 import org.testng.Assert;
-import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
@@ -525,7 +522,7 @@ public class TestMain {
 
     private ArrayList<String> run (String source){
         Interpreter interpreter = new Interpreter();
-        CustomScanner scanner = new CustomScanner(source);
+        LexerScanner scanner = new LexerScanner(source);
         List<Token> tokens = scanner.scanTokens();
 
         Parser parser = new Parser(tokens);

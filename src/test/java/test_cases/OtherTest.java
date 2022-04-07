@@ -1,6 +1,6 @@
 package test_cases;
 
-import cfpl.CustomScanner;
+import cfpl.LexerScanner;
 import cfpl.Interpreter;
 import cfpl.Parser;
 import cfpl.Token;
@@ -23,7 +23,7 @@ public class OtherTest {
 
     private ArrayList<String> run (String source){
         Interpreter interpreter = new Interpreter();
-        CustomScanner scanner = new CustomScanner(source);
+        LexerScanner scanner = new LexerScanner(source);
         List<Token> tokens = scanner.scanTokens();
 
         Parser parser = new Parser(tokens);

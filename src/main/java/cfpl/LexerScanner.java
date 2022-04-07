@@ -9,14 +9,14 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CustomScanner {
+public class LexerScanner {
     private final String source;
     private final List<Token> tokens = new ArrayList<Token>();
     private int start = 0;
     private int current = 0;
     private int line = 1;
 
-    public CustomScanner(String source) {
+    public LexerScanner(String source) {
         this.source = source;
     }
 
