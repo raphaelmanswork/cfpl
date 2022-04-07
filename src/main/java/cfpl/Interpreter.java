@@ -306,7 +306,6 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Void visitPrintStmt(Stmt.Print stmt) {
         Object value = evaluate(stmt.expression);
-        System.out.println(stringify(value));
         outputList.add(stringify(value));
         return null;
     }
@@ -326,6 +325,16 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     public Void visitWhileStmt(Stmt.While stmt) {
         while (isTruthy(evaluate(stmt.condition))) {
             execute(stmt.body);
+        }
+        return null;
+    }
+
+    @Override
+    public Void visitForStmt(Stmt.For stmt) {
+        evaluate(stmt.initStmt);
+        while(isTruthy(evaluate(stmt.condition))){
+            execute(stmt.body);
+            execute(stmt.updateStmt);
         }
         return null;
     }

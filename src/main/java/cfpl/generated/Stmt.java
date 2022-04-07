@@ -15,6 +15,7 @@ public abstract class Stmt {
     R visitPrintStmt(Print stmt);
     R visitVarStmt(Var stmt);
     R visitWhileStmt(While stmt);
+    R visitForStmt(For stmt);
   }
   public static class Input extends Stmt {
     public Input(List<Token> tokens) {
@@ -120,6 +121,24 @@ public abstract class Stmt {
     }
 
     public final Expr condition;
+    public final Stmt body;
+  }
+  public static class For extends Stmt {
+    public For(Expr initStmt, Expr condition, Stmt updateStmt, Stmt body) {
+      this.initStmt = initStmt;
+      this.condition = condition;
+      this.updateStmt = updateStmt;
+      this.body = body;
+    }
+
+    @Override
+    public <R> R accept(Visitor<R> visitor) {
+      return visitor.visitForStmt(this);
+    }
+
+    public final Expr initStmt;
+    public final Expr condition;
+    public final Stmt updateStmt;
     public final Stmt body;
   }
 

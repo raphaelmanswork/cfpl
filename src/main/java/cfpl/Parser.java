@@ -113,6 +113,9 @@ public class Parser {
             if (match(TokenType.WHILE)){
                 return whileStatement();
             }
+            if (match(TokenType.FOR)){
+                return forStatement();
+            }
             if (match(TokenType.LEFT_BRACE)) return new Stmt.Block(block());
             if (match(TokenType.START)){
                 return new Stmt.Executable(executable());
@@ -130,6 +133,19 @@ public class Parser {
         consume(TokenType.EOL, "Expect new line after ')'");
         Stmt body = statement();
         return new Stmt.While(condition, body);
+    }
+
+    private Stmt forStatement(){
+        consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.");
+        Expr init = expression();
+        consume(TokenType.SEMICOLON, "Expected semi-colon");
+        Expr condition = expression();
+        consume(TokenType.SEMICOLON, "Expected semi-colon");
+        Expr updateStmt = expression();
+        consume(TokenType.RIGHT_PAREN, "Expect ')' after condition.");
+        consume(TokenType.EOL, "Expect new line after ')'");
+        Stmt body = statement();
+        return new Stmt.For(init,condition,new Stmt.Expression(updateStmt), body);
     }
     private Stmt ifStatement() {
         consume(TokenType.LEFT_PAREN, "Expected '(' after 'if'.");
@@ -429,14 +445,11 @@ public class Parser {
             if (previous().type == TokenType.EOL) return;
 
             switch (peek().type) {
-                case CLASS:
-                case FUN:
                 case VAR:
                 case FOR:
                 case IF:
                 case WHILE:
                 case PRINT:
-                case RETURN:
                     return;
             }
 

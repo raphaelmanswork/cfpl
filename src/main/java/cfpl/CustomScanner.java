@@ -298,6 +298,8 @@ public class CustomScanner {
 
         // Control Structures
         keywords.put("WHILE", TokenType.WHILE);
+        keywords.put("FOR", TokenType.FOR);
+
         keywords.put("IF", TokenType.IF);
         keywords.put("ELSE", TokenType.ELSE);
 
