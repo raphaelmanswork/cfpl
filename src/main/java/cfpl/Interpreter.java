@@ -321,7 +321,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             value = evaluate(stmt.initializer);
         }
 
-        environment.define(stmt.name.lexeme, new Value(value, stmt.dataType));
+        environment.define(stmt, value);
         return null;
     }
 
@@ -357,5 +357,9 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     public void clearOutput() {
         outputList = new ArrayList<>();
+    }
+
+    void resetEnvironment(){
+        environment = new Environment();
     }
 }

@@ -41,6 +41,7 @@ public class Program {
 
         if (hadError) return;
 
+        interpreter.resetEnvironment();
         interpreter.interpret(statements);
     }
 

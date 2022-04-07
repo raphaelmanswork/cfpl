@@ -2,6 +2,7 @@ package cfpl;
 
 import cfpl.ErrorHandler.RuntimeError;
 import cfpl.enums.DataType;
+import cfpl.generated.Stmt;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,8 +19,14 @@ class Environment {
         this.enclosing = enclosing;
     }
 
-    void define(String name, Value value) {
-        values.put(name, value);
+
+    void define(Stmt.Var stmt, Object value) {
+        String name = stmt.name.lexeme;
+        if(values.get(name) != null){
+            throw new RuntimeError(stmt.name,
+                    "Variable already defined '" + name + "'.");
+        }
+        values.put(name, new Value(value,stmt.dataType));
     }
 
     Value get(Token name) {
@@ -35,7 +42,6 @@ class Environment {
 
     void assign(Token name, Object value) {
         if (values.containsKey(name.lexeme)) {
-
             DataType type = values.get(name.lexeme).dataType;
             values.put(name.lexeme, new Value(value,type));
             return;
