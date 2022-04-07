@@ -141,9 +141,6 @@ public class CustomScanner {
 
     private void identifier() {
         while (isAlphaNumeric(peek())) advance();
-        if (peek() == ':') {
-            advance();
-        }
 
         String text = source.substring(start, current);
         TokenType type = keywords.get(text);
@@ -158,7 +155,7 @@ public class CustomScanner {
     private boolean isAlpha(char c) {
         return (c >= 'a' && c <= 'z') ||
                 (c >= 'A' && c <= 'Z') ||
-                c == '_';
+                c == '_' || c== ':';
     }
 
     private char previous() {
@@ -311,8 +308,6 @@ public class CustomScanner {
         keywords.put("START", TokenType.START);
         keywords.put("STOP", TokenType.STOP);
 
-        keywords.put("INPUT", TokenType.INPUT);
-        keywords.put("OUTPUT", TokenType.PRINT);
         keywords.put("INPUT:", TokenType.INPUT);
         keywords.put("OUTPUT:", TokenType.PRINT);
 
