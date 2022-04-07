@@ -338,6 +338,147 @@ public class TestMain {
         Assert.assertEquals(output.get(0), "3");
 
     }
+
+    @Test(priority = 26)
+    public void testCase_26(){
+        String source = "VAR flag AS BOOL\n" +
+                "START\n" +
+                "flag=\"TRUE\" \n" +
+                "OUTPUT: (flag AND (\"FALSE\" AND \"TRUE\"))\n" +
+                "STOP";
+
+        ArrayList<String> output = run(source);
+        Assert.assertEquals(output.get(0), "FALSE");
+
+    }
+    @Test(priority = 27)
+    public void testCase_27(){
+        String source = "VAR IF AS INT\n" +
+                "START \n" +
+                "STOP";
+
+        ArrayList<String> output = run(source);
+
+    }
+    @Test(priority = 28)
+    public void testCase_28(){
+        String source = "START\n" +
+                "OUTPUT: (6 + (9/3) - (2*1))\n" +
+                "STOP";
+
+        ArrayList<String> output = run(source);
+        Assert.assertEquals(output.get(0), "7");
+
+    }
+    @Test(priority = 29)
+    public void testCase_29(){
+        String source = "VAR x AS INT\n" +
+                "START\n" +
+                "x = (5 + 2 * 6 - 10/2)\n" +
+                "OUTPUT: x\n" +
+                "STOP";
+
+        ArrayList<String> output = run(source);
+        Assert.assertEquals(output.get(0), "12");
+
+    }
+    @Test(priority = 30)
+    public void testCase_30(){
+        String source = "VAR x = -8, y AS INT\n" +
+                "START\n" +
+                "y = -x\n" +
+                "OUTPUT: y\n" +
+                "STOP";
+
+        ArrayList<String> output = run(source);
+        Assert.assertEquals(output.get(0), "8");
+
+    }
+    @Test(priority = 31)
+    public void testCase_31(){
+        String source = "START\n" +
+                "IF (4<10)\n" +
+                "START\n" +
+                "OUTPUT: \"Hello\"\n" +
+                "STOP\n" +
+                "STOP";
+
+        ArrayList<String> output = run(source);
+        Assert.assertEquals(output.get(0), "Hello");
+
+    }
+    @Test(priority = 32)
+    public void testCase_32(){
+        String source = "START\n" +
+                "IF (6==7)\n" +
+                "START\n" +
+                "OUTPUT: \"EQUAL\"\n" +
+                "STOP\n" +
+                "ELSE\n" +
+                "START\n" +
+                "OUTPUT: \"NOT EQUAL\"\n" +
+                "STOP\n" +
+                "STOP";
+
+        ArrayList<String> output = run(source);
+        Assert.assertEquals(output.get(0), "NOT EQUAL");
+
+    }
+    @Test(priority = 33)
+    public void testCase_33(){
+        String source = "START\n" +
+                "IF (4<>3)\n" +
+                "START\n" +
+                "\tIF(4>5)\n" +
+                "\tSTART\n" +
+                "\tOUTPUT: \"Hello\"\n" +
+                "\tSTOP\n" +
+                "\tELSE\n" +
+                "\tSTART\n" +
+                "\tOUTPUT: \"Hi\"\n" +
+                "\tSTOP\n" +
+                "STOP\n" +
+                "ELSE\n" +
+                "START\n" +
+                "OUTPUT: \"Bye\"\n" +
+                "STOP\n" +
+                "STOP";
+
+        ArrayList<String> output = run(source);
+
+    }
+    @Test(priority = 34)
+    public void testCase_34(){
+        String source = "VAR x=2 AS INT\n" +
+                "START\n" +
+                "WHILE (x<6)\n" +
+                "START\n" +
+                "OUTPUT: x & \"#\"\n" +
+                "x = x + 1\n" +
+                "STOP\n" +
+                "STOP";
+
+        ArrayList<String> output = run(source);
+
+    }
+//    @Test(priority = 35)
+//    public void testCase_35(){
+//        String source = "VAR x=1, y=0 AS INT\n" +
+//                "START\n" +
+//                "\tIF(8>2)\n" +
+//                "\tSTART\n" +
+//                "\t\tWHILE(x<4)\n" +
+//                "\t\tSTART\n" +
+//                "\t\ty=y+1\n" +
+//                "\t\tSTOP\n" +
+//                "\tOUTPUT: y\n" +
+//                "\tSTOP\n" +
+//                "STOP";
+//
+//        ArrayList<String> output = run(source);
+//        Assert.assertEquals(output.get(0), "21");
+//
+//    }
     @Test(description = "Must output: 5", priority = 100)
     public void testCase_test(){
         String source = "VAR x = 5 AS INT\n" +
