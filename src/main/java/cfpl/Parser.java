@@ -116,7 +116,6 @@ public class Parser {
             if (match(TokenType.FOR)){
                 return forStatement();
             }
-            if (match(TokenType.LEFT_BRACE)) return new Stmt.Block(block());
             if (match(TokenType.START)){
                 return new Stmt.Executable(executable());
             }

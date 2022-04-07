@@ -9,7 +9,6 @@ public abstract class Stmt {
    public interface Visitor<R> {
     R visitInputStmt(Input stmt);
     R visitExecutableStmt(Executable stmt);
-    R visitBlockStmt(Block stmt);
     R visitExpressionStmt(Expression stmt);
     R visitIfStmt(If stmt);
     R visitPrintStmt(Print stmt);
@@ -37,18 +36,6 @@ public abstract class Stmt {
     @Override
     public <R> R accept(Visitor<R> visitor) {
       return visitor.visitExecutableStmt(this);
-    }
-
-    public final List<Stmt> statements;
-  }
-  public static class Block extends Stmt {
-    public Block(List<Stmt> statements) {
-      this.statements = statements;
-    }
-
-    @Override
-    public <R> R accept(Visitor<R> visitor) {
-      return visitor.visitBlockStmt(this);
     }
 
     public final List<Stmt> statements;

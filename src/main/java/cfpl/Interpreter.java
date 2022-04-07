@@ -232,31 +232,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
-    @Override
-    public Void visitBlockStmt(Stmt.Block stmt) {
-        executeBlock(stmt.statements, new Environment(environment));
-        return null;
-    }
-
     void executeExecutable(List<Stmt> statements) {
         for (Stmt statement : statements) {
-            execute(statement);
-        }
-    }
-
-    void executeBlock(List<Stmt> statements,
-                      Environment environment) {
-        Environment previous = this.environment;
-        try {
-            this.environment = environment;
-
-            for (Stmt statement : statements) {
-                if(statement != null){
-                    execute(statement);
-                }
+            if(statement !=null){
+                execute(statement);
             }
-        } finally {
-            this.environment = previous;
         }
     }
 
