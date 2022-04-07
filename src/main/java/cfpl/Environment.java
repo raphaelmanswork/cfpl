@@ -26,7 +26,7 @@ class Environment {
             throw new RuntimeError(stmt.name,
                     "Variable already defined '" + name + "'.");
         }
-        values.put(name, new Value(value,stmt.dataType));
+        values.put(name, new Value(value,stmt.dataType,stmt.name.line));
     }
 
     Value get(Token name) {
@@ -43,7 +43,7 @@ class Environment {
     void assign(Token name, Object value) {
         if (values.containsKey(name.lexeme)) {
             DataType type = values.get(name.lexeme).dataType;
-            values.put(name.lexeme, new Value(value,type));
+            values.put(name.lexeme, new Value(value,type, name.line));
             return;
         }
 

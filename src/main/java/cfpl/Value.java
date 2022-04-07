@@ -8,17 +8,18 @@ public class Value {
     Object value;
     DataType dataType;
 
-    public Value(Object value, DataType type) {
-        this.initValue(value, type);
+    public Value(Object value, DataType type, int line) {
+        this.initValue(value, type, line);
     }
 
-    void initValue(Object value, DataType type) {
+
+    void initValue(Object value, DataType type, int line) {
         this.dataType = type;
         try {
             this.value = applyDataType(value, type);
         } catch (ClassCastException | NumberFormatException e) {
             System.out.println(e);
-            Token t = new Token(TokenType.VAR, String.valueOf(value), value, 0);
+            Token t = new Token(TokenType.VAR, String.valueOf(value), value, line);
             throw new RuntimeError(t,
                     "ASSIGNMENT ERROR: Invalid datatype (Must be: "+ type.toString() +").");
         } catch( NullPointerException e){

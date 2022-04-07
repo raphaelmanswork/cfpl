@@ -95,7 +95,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     private void checkNumberOperands(Token operator,
                                      Object left, Object right) {
-        System.out.println(right.getClass());
+
         if (left instanceof Double && right instanceof Double) return;
         if (left instanceof Number && right instanceof Number){
             return;

@@ -120,6 +120,7 @@ public class Parser {
             if (match(TokenType.START)){
                 return new Stmt.Executable(executable());
             }
+
             return expressionStatement();
         } catch (ParseError error) {
             synchronize();
@@ -242,8 +243,11 @@ public class Parser {
 
     private Stmt expressionStatement() {
         Expr expr = expression();
-        consume(TokenType.EOL, "Expected new line after expression.");
-        return new Stmt.Expression(expr);
+        if(expr instanceof Expr.Assign){
+            consume(TokenType.EOL, "Expected new line after expression.");
+            return new Stmt.Expression(expr);
+        }
+        throw error(previous(),"Invalid statement");
     }
 
     private List<Stmt> block() {
@@ -370,7 +374,6 @@ public class Parser {
         }
 
         if (match(TokenType.IDENTIFIER)) {
-
             return new Expr.Variable(previous());
         }
 
