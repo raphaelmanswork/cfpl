@@ -309,10 +309,6 @@ public class CustomScanner {
         keywords.put("IF", TokenType.IF);
         keywords.put("ELSE", TokenType.ELSE);
 
-        keywords.put("FALSE", TokenType.FALSE);
-        keywords.put("TRUE", TokenType.TRUE);
-
-
         // Executable Block
         keywords.put("START", TokenType.START);
         keywords.put("STOP", TokenType.STOP);
