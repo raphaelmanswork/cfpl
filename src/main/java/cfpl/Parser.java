@@ -64,8 +64,6 @@ public class Parser {
     }
 
     private Stmt statement() {
-
-        if (match(TokenType.IF)) return ifStatement();
         if (match(TokenType.START)) return new Stmt.Executable(executable());
         executeError = true;
         throw error(peek(), "Expected to be wrapped in executable");
